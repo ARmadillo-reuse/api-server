@@ -30,10 +30,19 @@ def deploy(stable=False,app="web_api"):
     print "======================================================"
     code_dir = "/home/armadillo/%s" % environment
 
-    with prefix('WORKON_HOME=$HOME/.virtualenvs'):
-        with prefix('source /usr/local/bin/virtualenvwrapper.sh'):
-            with prefix('workon %s' % environment):
-                with cd(code_dir):
+    with cd(code_dir):
+        with prefix('WORKON_HOME=$HOME/.virtualenvs'):
+            with prefix('source /usr/local/bin/virtualenvwrapper.sh'):
+                with prefix('workon %s' % environment):
+                    print "Updating remote code"
                     run("git pull origin %s" % branch)
+                    print "Migrating database"
                     run("python manage.py migrate %s" % app)
+                    print "Running tests"
                     run("python manage.py test")
+        print "Restarting web server"
+        run("touch armadillo_reuse/wsgi.py")
+
+        print "======================================================"
+        print "==                   All done!                      =="
+        print "======================================================"
