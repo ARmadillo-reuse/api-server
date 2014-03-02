@@ -21,7 +21,8 @@ def prepare_deploy():
     commit()
     push()
 
-def deploy(stable=False,app="web_api"):
+def deploy(state="unstable",app="web_api"):
+    stable = state == "stable"
     branch = "master" if stable else "dev"
     environment = "server-" + ("stable" if stable else "unstable")
     message = "Deploying branch %s to %s" % (branch, environment)
