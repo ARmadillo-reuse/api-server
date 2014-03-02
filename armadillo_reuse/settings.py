@@ -57,18 +57,43 @@ WSGI_APPLICATION = 'armadillo_reuse.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    },
+ALL_DATABASES = {
     'stable': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'server_stable',
         'USER': 'web_stable',
         'PASSWORD': 'web_stable'
-    }
+    },
+    'unstable': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'server_unstable',
+        'USER': 'web_unstable',
+        'PASSWORD': 'web_unstable'
+    },
+    'local_test': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
 }
+
+DATABASES = {}
+
+# Define DATABASES dynamically
+
+import socket
+
+# Force use of the development database for local versions
+if socket.gethostname() is not "armadillo":
+    DATABASES["default"] = ALL_DATABASES["local_test"]
+else:
+    from subprocess import check_output
+    branches = check_output(["git","branch"]).strip().split("\n")
+    branch = next([x for x in branches if x[0]=="*"])
+    if branch is "stable":
+        DATABASES["default"] = ALL_DATABASES["master"]
+    else:
+        DATABASES["default"] = ALL_DATABASES["dev"]
+    
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
