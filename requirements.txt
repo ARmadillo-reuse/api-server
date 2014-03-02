@@ -1,0 +1,17 @@
+Django==1.6.2
+GnuPGInterface==0.3.2
+MySQL-python==1.2.5
+South==0.8.4
+apt-xapian-index==0.44
+argparse==1.2.1
+chardet==2.0.1
+command-not-found==0.2.44
+language-selector==0.1
+python-apt==0.8.3ubuntu7.2
+python-debian==0.1.21ubuntu1
+stevedore==0.14.1
+ufw==0.31.1-1
+virtualenv==1.11.4
+virtualenv-clone==0.2.4
+virtualenvwrapper==4.2
+wsgiref==0.1.2
