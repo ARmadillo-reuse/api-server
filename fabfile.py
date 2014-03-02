@@ -21,9 +21,13 @@ def prepare_deploy():
     commit()
     push()
 
-def deploy(app="web_api", stable=False):
+def deploy(stable=False,app="web_api"):
     branch = "master" if stable else "dev"
     environment = "server-" + ("stable" if stable else "unstable")
+    message = "Deploying branch %s to %s" % (branch, environment)
+    print "======================================================"
+    print ("==    %s  ==" % message.ljust(42))
+    print "======================================================"
     code_dir = "/home/armadillo/%s" % environment
 
     with prefix('WORKON_HOME=$HOME/.virtualenvs'):
