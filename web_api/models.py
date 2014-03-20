@@ -22,6 +22,15 @@ class Item(models.Model):
     """The last time this item was updated"""
     modified = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        ret_val = super(Item, self).save(*args, **kwargs)
+        if self.thread.modified is None:
+            self.thread.modified = self.modified
+        else:
+            self.thread.modified = max(self.thread.modified, self.modified)
+        self.thread.save()
+        return ret_val
+
 
 class AbstractEmail(models.Model):
     class Meta:
@@ -49,6 +58,14 @@ class AbstractEmail(models.Model):
     """The thread this email is a part of"""
     thread = models.ForeignKey('EmailThread')
 
+    def save(self, *args, **kwargs):
+        ret_val = super(AbstractEmail, self).save(*args, **kwargs)
+        if self.thread.modified is None:
+            self.thread.modified = self.modified
+        else:
+            self.thread.modified = max(self.thread.modified, self.modified)
+        self.thread.save()
+        return ret_val
     
 
 class NewPostEmail(AbstractEmail):
@@ -73,8 +90,17 @@ class ClaimedItemEmail(AbstractEmail):
 class EmailThread(models.Model):
     """
     A group of one or more emails in the same conversation/thread and the
-    associated items
+    associated items.
     """
     
     """The subject of the email thread"""
     subject = models.CharField(max_length=256)
+
+    # Note that this is not an auto_now field; it can and must be updated
+    # manually.
+    """When the thread was last updated"""
+    modified = models.DateTimeField(null=True)
+
+
+
+                

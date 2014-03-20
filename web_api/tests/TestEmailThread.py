@@ -1,4 +1,5 @@
 from django.test import TestCase
+import django.utils.timezone
 from web_api.models import *
 
 class TestEmailThread(TestCase):
@@ -41,3 +42,16 @@ class TestEmailThread(TestCase):
             self.assertEqual(p.thread, e)
 
         self.assertEqual(EmailThread.objects.all()[1].newpostemail_set.count(),0)
+
+    def test_thread_has_modified_property(self):
+        e = EmailThread.objects.all()[0]
+        p1 = NewPostEmail.objects.create(subject="Post A", thread=e)
+        mod = e.modified
+        self.assertIsNotNone(mod)
+
+        p1.subject="Post B"
+        p1.save()
+        self.assertTrue(e.modified >= mod)
+        
+
+        
