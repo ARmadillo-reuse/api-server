@@ -11,7 +11,7 @@ class TestNewPostEmail(TestCase):
         
     def test_new_post_email_has_received_time(self):
         p = NewPostEmail.objects.all()[0]
-        self.assertTrue(p.received < django.utils.timezone.now())
+        self.assertTrue(p.received <= django.utils.timezone.now())
 
     def test_new_post_email_has_modified_time(self):
         p = NewPostEmail.objects.all()[0]
