@@ -35,44 +35,33 @@ class TestEmailParser(TestCase):
         "1 SAT preparation workbook.\n\n"
         "1 harness for medium-sized dog (adjustable).\n\n"
         "Please don't email me -- just come, snag and post!\n\n"
-        "Thanks,\nAmy\n\n"
-        "-- \nAmy Stout\nComputer Science Librarian\n"
-        "Massachusetts Institute of Technology\n617.253.4442\nastout@mit.edu"}),
+        "Thanks,\nAmy"}),
                 (32927, {'from': 'jennyqiu@mit.edu',
                          'subject': 'Re: 2 one gallon jugs of tropicana orange juice',
                          'text':
-        "claimed!\n\nOn Wed, Aug 4, 2010 at 4:00 PM, Sarah Woodring Bates "
-        "<swbates@mit.edu>wrote:\n\n> Hi,\n>\n> I have 2 one gallon jugs full of "
-        "tropicana orange juice (unopened)\n> available\n> outside 3-237.\n>\n> "
-        "First come first serve (by 5:30pm)\n>\n> ~Sarah Bates\n"
-        "> _______________________________________________\n> To sub/unsubscribe or "
-        "to see the list rules:\n> http://mailman.mit.edu/mailman/listinfo/reuse\n"
-        ">\n\n\n\n-- \nJenny Qiu\nMassachusetts Institute of Technology (MIT)\n"
-        "Course 2A - Mechanical Engineering\nClass of 2013"}),
+        "claimed!"}),
                 (34557, {'from': 'jbuz@mit.edu',
                          'subject': 'Re: maps, 54-1721',
                          'text':
-                         "I took the bike map\n\n"
-                        "On 11/22/2010 11:46 AM, Brian Rose wrote:\n"
-                        "> A bunch of old road maps:\n>\n"
-                        "> - Eastern Ontario\n"
-                        "> - Canada (yes all of it)\n"
-                        "> - Atlantic Provinces and Eastern Maine\n"
-                        "> - Boston\n"
-                        "> - Boston bike map\n"
-                        "> - Canoe Routes of Algonquin Provincial Park (Ontario)\n>\n"
-                        "> In the mailbox on the door of 54-1721.  "
-                        "Don't email me, just take and post.\n>\n"
-                        "> ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n"
-                        "> Brian E.J. Rose, PhD\n"
-                        "> Postdoctoral Associate, Climate Dynamics\n"
-                        "> Department of Earth, Atmospheric and Planetary Sciences\n"
-                        "> Massachusetts Institute of Technology\n"
-                        "> office: 54-1721          phone: 617-253-5935\n"
-                        "> email:  brose@mit.edu\n"
-                        "> ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n>\n> "
-                        "_______________________________________________\n"
-                        "> To sub/unsubscribe or to see the list rules:  "
-                        "http://mailman.mit.edu/mailman/listinfo/reuse"
-                         })
+                         "I took the bike map"
+                         }),
+                (47576, {'from':'jessmith@mit.edu',
+                          'subject': 'chairs and computer extras',
+                          'text':
+        "There are a bunch of mice, cables, and a couple of chairs available for re-=\n"
+        "use outside of 35-338.\n\nPlease come help yourself."}),
+                (47571, {'from': 'jenifer.leibrandt@gmail.com',
+                         'subject': 'Re: large chunk of green foam',
+                         'text': 'Taken'}),
+                (47570, {'from': 'heinl@mit.edu',
+                         'subject': 'Kimball office furniture work desk top surface to go',
+                         'text':
+        'Removed a "bullet top" desk surface from one office in W35 in order to reco=\n'
+        "nfigure the office and the top needs to leave the building.   Email only to=\n"
+        ": heinl@mit.edu<mailto:heinl@mit.edu>  If you want to come by and remove, I=\n"
+        " will provide you with the location for pick up in W34.  Good weight to it =\n"
+        "-Heavy and solid top, will require a hand truck or dolly to move out and pr=\n"
+        "obably two people. Piece is about 10 years old, no legs or hardware-  Color=\n"
+        " is honey and approximate dimensions are 6' x 2' 6\".  First come, first ser=\n"
+        "ved!"})
                 ]

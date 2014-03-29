@@ -1,0 +1,82 @@
+Received: from mailhub-dmz-4.mit.edu (mailhub-dmz-4.mit.edu [18.7.62.38])
+	by pch.mit.edu (8.13.6/8.12.8) with ESMTP id s1KKM82F007843
+	for <reuse@PCH.mit.edu>; Thu, 20 Feb 2014 15:22:08 -0500
+Received: from dmz-mailsec-scanner-4.mit.edu (dmz-mailsec-scanner-4.mit.edu
+	[18.9.25.15])
+	by mailhub-dmz-4.mit.edu (8.13.8/8.9.2) with ESMTP id s1KKLmt8006846;
+	Thu, 20 Feb 2014 15:22:08 -0500
+X-AuditID: 1209190f-f790b6d000000c3a-d9-530663efa917
+Authentication-Results: symauth.service.identifier
+Received: from mail-qc0-f182.google.com (mail-qc0-f182.google.com
+	[209.85.216.182]) (using TLS with cipher RC4-SHA (128/128 bits))
+	(Client did not present a certificate)
+	by dmz-mailsec-scanner-4.mit.edu (Symantec Messaging Gateway) with SMTP
+	id 23.A6.03130.FE366035; Thu, 20 Feb 2014 15:22:07 -0500 (EST)
+Received: by mail-qc0-f182.google.com with SMTP id w7so1838636qcr.27
+	for <multiple recipients>; Thu, 20 Feb 2014 12:22:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113;
+	h=message-id:mime-version:to:from:subject:date:content-type;
+	bh=hKOOlKTY+GG+MHEpnxmD6coDWtuRc2ztVBITBuCACT4=;
+	b=Kk5NrJ+2el3w1Vvaa0XJ8hNOTYx02PRHbiKagT7bd1ZfSAruzciOz9DTQCxlWXXfPq
+	XOD7iULUCQ+5QOM55mreoawh7L8U1sm/8EWEc9deOIJDXDUj9MmjoDtq0vz0esetP2I7
+	7y0Yd+C4hDh01HHmPnEW6fwgI+C/PmwIaTMx4udsZKjhAX7UBeV8PcL93IjQJ4ZElGGf
+	x+9yaOVSctAQUmf/3vS+mpUuLopnULNG14KOEuJwZ+nxAzieA3l0gu5aDSMmW5AwjGOE
+	1NI6bKpRax5i0FVsINpUr6iZD5SLieIuUsU0O/tnAGp5nMr/j29I0AkkmFGYUnTAfz/X
+	focg==
+X-Received: by 10.140.90.80 with SMTP id w74mr4229841qgd.96.1392927726987;
+	Thu, 20 Feb 2014 12:22:06 -0800 (PST)
+Received: from [18.189.48.127] ([18.189.48.127])
+	by mx.google.com with ESMTPSA id r40sm9088119qga.23.2014.02.20.12.22.05
+	for <multiple recipients>
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+	Thu, 20 Feb 2014 12:22:06 -0800 (PST)
+Message-ID: <530663ee.2b328c0a.a510.43c7@mx.google.com>
+MIME-Version: 1.0
+To: Charles z Guan <charlesg@mit.edu>, "reuse@MIT.EDU" <reuse@mit.edu>
+From: Jenifer Leibrandt <jenifer.leibrandt@gmail.com>
+Date: Thu, 20 Feb 2014 15:21:34 -0500
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKKsWRWlGSWpSXmKPExsVyMfTGNt33yWzBBgfmWVn0zrzDZHG7aQKb
+	A5NH05mjzAGMUVw2Kak5mWWpRfp2CVwZj769YSz4IVzx6ulrpgbGo4JdjBwcEgImEt2bCrsY
+	OTkYBYwkdp97xQpiSwiISVy4t54NxBYS2MYk8XRWaBcjF5DdxyixbXknE4jDIvCJRWLLw30s
+	EB2VEje2PYHq0JLov/+JHaJjBpNEU/c3RpAEr4C5xPNbk9ghbEGJkzOfgDWLCLhJ9DXPZAax
+	2QRMJaZuX8UOcp2wgJ7E5zf8IGEWAVWJju5rTCA2s0CExIPZn5gnMArMQjJpFpIUhK0tsWzh
+	ayCbA8jWlFi/Sx9VGMTWkGidM5d9ASPbKkbZlNwq3dzEzJzi1GTd4uTEvLzUIl0TvdzMEr3U
+	lNJNjMAQF+KU5N/B+O2g0iFGAQ5GJR7eE1JswUKsiWXFlbmHGCU5mJREeaMSgUJ8SfkplRmJ
+	xRnxRaU5qcWHGCU4mJVEeJtsgHK8KYmVValF+TApaQ4WJXHeWotfQUIC6YklqdmpqQWpRTBZ
+	Jg72Q4wyHBxKErybQSYLFqWmp1akZeaUIKvhBBFcIGt4gNbEghTyFhck5hZnpkMUnWI05pi8
+	4ecnRo7jR/98YhRiycvPS5US521NAioVACnNKM2DGwlLXZcYZaWEeRkZGBiEeIBuAgYFqvwr
+	RnFgMAjzygMToRBPZl4J3L5XQKcwAZ1SspEV5JSSRISUVANjtLjP9NecXTlz5DRmGearnt3y
+	/MzPHNetMzf3+G+vefpfIqjiQNBXJ5/mmUzva3pk1ut9CzrxZ/O3HY//zuy1Njz2z3zpgUQt
+	xqcee+qjNszUkd/oJfdXv4rVYscC7ZyKZ88Pn2TzfThtg2H10w7FjtsWfrc/2YmLx28xnpy6
+	NKswOP1rQ8N+JZbijERDLeai4kQAbiosKVgDAAA=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.6
+Subject: Re: [Reuse] large chunk of green foam
+X-BeenThere: reuse@mit.edu
+X-Mailman-Version: 2.1.6
+Precedence: list
+X-List-Received-Date: Thu, 20 Feb 2014 20:22:09 -0000
+
+Taken
+
+-----Original Message-----
+From: "Charles z Guan" <charlesg@MIT.EDU>
+Sent: =E2=80=8E2/=E2=80=8E20/=E2=80=8E2014 2:41 PM
+To: "reuse@MIT.EDU" <reuse@MIT.EDU>
+Subject: [Reuse] large chunk of green foam
+
+8 foot by 2 foot by 2 inch chunk of light green foam. I think it's expensiv=
+e,
+but it's been sitting in the lab for a year.
+
+Come to N52-363 to claim. Weighs a bunch - it's denser than normal foam.
+
+--=20
+Charles Z. Guan
+Instructor
+MIT-SUTD Collaboration, MIT
+_______________________________________________
+To sub/unsubscribe or to see the list rules:  http://mailman.mit.edu/mailma=
+n/listinfo/reuse
+
