@@ -2,9 +2,9 @@ import os
 from django.test import TestCase
 import web_api.processing
 
-class TestEmailParser(TestCase):
+class TestEmailPreProcessor(TestCase):
     def test_can_parse_emails(self):
-        parser = web_api.processing.EmailParser()
+        parser = web_api.processing.EmailPreProcessor()
         directory = os.path.dirname(os.path.realpath(__file__)) + "/files"
 
         for (num, expected) in self.get_emails():
