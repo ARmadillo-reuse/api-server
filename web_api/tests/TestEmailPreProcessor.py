@@ -63,5 +63,13 @@ class TestEmailPreProcessor(TestCase):
         "-Heavy and solid top, will require a hand truck or dolly to move out and pr=\n"
         "obably two people. Piece is about 10 years old, no legs or hardware-  Color=\n"
         " is honey and approximate dimensions are 6' x 2' 6\".  First come, first ser=\n"
-        "ved!"})
+        "ved!"}),
+                (999999, {'from': 'aileen.kawabe@gmail.com',
+                          'subject': 'Re: Large assortment: electronics, crafts, toys, etc.',
+                          'text':
+        "Just added:\n\n"
+        "* bag full of kitchen towels, potholders, fabric napkins\n"
+        "* pirate hat\n"
+        "* 12amp Dirt Devil featherlite - unknown condition - turns on but smells\n"
+        "bad. May just need cleaning and a new bag."})
                 ]
