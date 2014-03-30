@@ -2,13 +2,13 @@ import re
 import base64
 import email.parser
 
-class EmailParser(object):
+class EmailPreProcessor(object):
     """
-    A class for parsing emails from text into a set of common fields
+    A class for processing emails from text into a set of common fields
     """
 
     def __init__(self):
-        super(EmailParser, self).__init__()
+        super(EmailPreProcessor, self).__init__()
         self.parser = email.parser.Parser()
         self.email_pattern = re.compile(r'([a-z0-9-]|\"(?!@\")*\")+@([a-z0-9-]+\.)+[a-z]+')
 
@@ -201,7 +201,7 @@ class EmailParser(object):
             if "zip" in rules and "02139" in line:
                 score += 0.5
                 rules.remove("zip")
-                
+            
             if not rules: break
         
         if score > 3:
