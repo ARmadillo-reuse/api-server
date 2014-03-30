@@ -116,12 +116,14 @@ class EmailPreProcessor(object):
                 for x in range(reply_block[0], reply_block[1]+1):
                     keep_lines.remove(x)
             
-            lines = [line for index, line in enumerate(lines)
-                     if index in keep_lines]
+            if keep_lines != range(len(lines)):
+                lines = [line for index, line in enumerate(lines)
+                         if index in keep_lines]
+                
+                return self.strip_reply("\n".join(lines))
             
-            return self.strip_reply("\n".join(lines))
         
-        elif carrot_lines:
+        if carrot_lines:
             keep_lines = range(len(lines))
             
             for reply_block in carrot_blocks:
@@ -133,7 +135,7 @@ class EmailPreProcessor(object):
             
             return self.strip_reply("\n".join(lines))
         
-        elif start_reply_lines:
+        if start_reply_lines:
             keep_lines = range(len(lines))
             
             lines = [line for index, line in enumerate(lines)
