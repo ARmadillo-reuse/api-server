@@ -24,11 +24,12 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         ret_val = super(Item, self).save(*args, **kwargs)
-        if self.thread.modified is None:
+        if self.thread and self.thread.modified is None:
             self.thread.modified = self.modified
-        else:
+        elif self.thread:
             self.thread.modified = max(self.thread.modified, self.modified)
-        self.thread.save()
+        if self.thread:
+            self.thread.save()
         return ret_val
 
 
