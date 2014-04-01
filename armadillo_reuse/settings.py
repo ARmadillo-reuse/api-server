@@ -90,9 +90,9 @@ else:
     branches = check_output(["git","branch"]).strip().split("\n")
     branch = next([x for x in branches if x[0]=="*"])
     if branch is "stable":
-        DATABASES["default"] = ALL_DATABASES["master"]
+        DATABASES["default"] = ALL_DATABASES["stable"]
     else:
-        DATABASES["default"] = ALL_DATABASES["dev"]
+        DATABASES["default"] = ALL_DATABASES["unstable"]
     
 
 # Internationalization

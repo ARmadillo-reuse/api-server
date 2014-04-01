@@ -23,7 +23,7 @@ def prepare_deploy():
 
 def deploy(state="unstable",app="web_api"):
     stable = state == "stable"
-    branch = "master" if stable else "dev"
+    branch = "master" if stable else "unstable"
     environment = "server-" + ("stable" if stable else "unstable")
     message = "Deploying branch %s to %s" % (branch, environment)
     print "======================================================"
