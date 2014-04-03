@@ -26,6 +26,13 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'armadilloserver@gmail.com'
+EMAIL_HOST_PASSWORD = 'arma123dillo'
+DEFAULT_FROM_EMAIL = 'no-reply@reusemobile.mit.edu'
+
 
 # Application definition
 
@@ -45,7 +52,7 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-   # 'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -85,7 +92,7 @@ DATABASES = {}
 import socket
 
 # Force use of the development database for local versions
-if socket.gethostname() is not "armadillo":
+if socket.gethostname() != "armadillo":
     DATABASES["default"] = ALL_DATABASES["local_test"]
 else:
     from subprocess import check_output
