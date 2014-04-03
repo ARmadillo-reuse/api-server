@@ -83,12 +83,12 @@ DATABASES = {}
 import socket
 
 # Force use of the development database for local versions
-if socket.gethostname() is not "armadillo":
+if socket.gethostname() != "armadillo":
     DATABASES["default"] = ALL_DATABASES["local_test"]
 else:
     from subprocess import check_output
     branches = check_output(["git","branch"]).strip().split("\n")
-    branch = next([x for x in branches if x[0]=="*"])
+    branch = next(x for x in branches if x[0]=="*")
     if branch is "stable":
         DATABASES["default"] = ALL_DATABASES["stable"]
     else:
@@ -113,3 +113,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+print DATABASES
