@@ -86,13 +86,10 @@ import socket
 if socket.gethostname() != "armadillo":
     DATABASES["default"] = ALL_DATABASES["local_test"]
 else:
-    from subprocess import check_output
-    branches = check_output(["git","branch"]).strip().split("\n")
-    branch = next(x for x in branches if x[0]=="*")
-    if branch is "stable":
-        DATABASES["default"] = ALL_DATABASES["stable"]
-    else:
+    if "unstable" in BASE_DIR:
         DATABASES["default"] = ALL_DATABASES["unstable"]
+    else:
+        DATABASES["default"] = ALL_DATABASES["stable"]
     
 
 # Internationalization
