@@ -1,0 +1,75 @@
+Received: from mailhub-dmz-2.mit.edu (MAILHUB-DMZ-2.MIT.EDU [18.7.62.37])
+	by pch.mit.edu (8.13.6/8.12.8) with ESMTP id o74K4KaG001647
+	for <reuse@PCH.mit.edu>; Wed, 4 Aug 2010 16:04:20 -0400
+Received: from dmz-mailsec-scanner-4.mit.edu (DMZ-MAILSEC-SCANNER-4.MIT.EDU
+	[18.9.25.15])
+	by mailhub-dmz-2.mit.edu (8.13.8/8.9.2) with ESMTP id o74K111Y031871;
+	Wed, 4 Aug 2010 16:04:19 -0400
+X-AuditID: 1209190f-b7b0aae000000a7d-1c-4c59c7c627dc
+Received: from mail-ww0-f41.google.com (mail-ww0-f41.google.com [74.125.82.41])
+	by dmz-mailsec-scanner-4.mit.edu (Symantec Brightmail Gateway) with
+	SMTP id D9.97.02685.6C7C95C4; Wed,  4 Aug 2010 16:04:23 -0400 (EDT)
+Received: by wwc33 with SMTP id 33so1357151wwc.0
+	for <multiple recipients>; Wed, 04 Aug 2010 13:04:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=gamma;
+	h=domainkey-signature:mime-version:received:sender:received
+	:in-reply-to:references:date:x-google-sender-auth:message-id:subject
+	:from:to:cc:content-type;
+	bh=6dmGBNITLJqYlQJXB7XRrCvzKg/2uDzhRiBVWePOKIM=;
+	b=HlyHIvC/+tiF1Z/uA/QnM5XCAUsm4nbQQcxIIOZDZVDxhOMtghgKv+zrznFVpuXztg
+	CIhNWPVI77gkfpGL9XDj8gFBv45cpJ8xLy9uWMHYkDvrnKvL9Ip/faN3zIy7+5914VU+
+	95S4Yan45uYIpdKB1BFoHmYtt1IMTrh6+BGHE=
+DomainKey-Signature: a=rsa-sha1; c=nofws; d=gmail.com; s=gamma;
+	h=mime-version:sender:in-reply-to:references:date
+	:x-google-sender-auth:message-id:subject:from:to:cc:content-type;
+	b=JAvFrj7nLooYvQa8cbjp24lqw7cIVHVUUuzzePFrx1lmWLN90v/06DCXE8i1Fh+pSl
+	102ZWNXeFiez8gJOCQezE1wYo78/frfFXIva2dSeu584KCaFhyKS2akGl+X/YXjLwNcZ
+	svwGC7sjivq5cfG/qqTAoV5b5Z9NFQPbUsbzA=
+MIME-Version: 1.0
+Received: by 10.216.161.71 with SMTP id v49mr8138973wek.94.1280952258535; Wed, 
+	04 Aug 2010 13:04:18 -0700 (PDT)
+Sender: jennyq91@gmail.com
+Received: by 10.216.85.205 with HTTP; Wed, 4 Aug 2010 13:04:18 -0700 (PDT)
+In-Reply-To: <20100804160008.4bbsi41d8oko0kgg@webmail.mit.edu>
+References: <20100804160008.4bbsi41d8oko0kgg@webmail.mit.edu>
+Date: Wed, 4 Aug 2010 16:04:18 -0400
+X-Google-Sender-Auth: jdKtzGOPxtmffWYxcufXOLljyJc
+Message-ID: <AANLkTikavwT2dedo=p5pFh0r9k9y-buxHhhZCGLDxNxS@mail.gmail.com>
+From: Jenny Qiu <jennyqiu@MIT.EDU>
+To: Sarah Woodring Bates <swbates@MIT.EDU>
+X-Brightmail-Tracker: AAAAAhV7UBkVfAtz
+Content-Type: text/plain; charset=ISO-8859-1
+X-Content-Filtered-By: Mailman/MimeDel 2.1.6
+Cc: reuse@mit.edu
+Subject: Re: [Reuse] 2 one gallon jugs of tropicana orange juice
+X-BeenThere: reuse@mit.edu
+X-Mailman-Version: 2.1.6
+Precedence: list
+X-List-Received-Date: Wed, 04 Aug 2010 20:04:20 -0000
+
+claimed!
+
+On Wed, Aug 4, 2010 at 4:00 PM, Sarah Woodring Bates <swbates@mit.edu>wrote:
+
+> Hi,
+>
+> I have 2 one gallon jugs full of tropicana orange juice (unopened)
+> available
+> outside 3-237.
+>
+> First come first serve (by 5:30pm)
+>
+> ~Sarah Bates
+> _______________________________________________
+> To sub/unsubscribe or to see the list rules:
+> http://mailman.mit.edu/mailman/listinfo/reuse
+>
+
+
+
+-- 
+Jenny Qiu
+Massachusetts Institute of Technology (MIT)
+Course 2A - Mechanical Engineering
+Class of 2013
+
