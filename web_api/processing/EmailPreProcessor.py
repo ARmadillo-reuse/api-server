@@ -67,15 +67,19 @@ class EmailPreProcessor(object):
             
             if len(payload) == 1:
                 to_return = payload[0]
-            elif all((x["Content-Type"].lower().startswith("text/plain")
-                    for x in important_parts)):
+            elif all(x["Content-Type"].lower().startswith("text/plain")
+                    for x in important_parts):
                 to_return = max((x for x in payload), key=lambda x:len(x.get_payload()))
+                
+            elif any(x.is_multipart() for x in important_parts):
+                return (self.parse_text(x) for x in important_parts
+                                           if x.is_multipart()).next() 
 
         if to_return:
             if to_return["Content-Transfer-Encoding"] == "base64":
                 return base64.decodestring(to_return.get_payload())
             else:
-                return to_return.get_payload().strip()
+                return to_return.get_payload().strip().replace("=\n","")
         
         raise Exception("can't parse email")
 
