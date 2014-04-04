@@ -71,5 +71,11 @@ class TestEmailPreProcessor(TestCase):
         "* bag full of kitchen towels, potholders, fabric napkins\n"
         "* pirate hat\n"
         "* 12amp Dirt Devil featherlite - unknown condition - turns on but smells\n"
-        "bad. May just need cleaning and a new bag."})
+        "bad. May just need cleaning and a new bag."}),
+                (999998, {'from': 'ayaari@mit.edu',
+                          'subject': 'Re: Small trampoline',
+                          'text':
+        "Who knew there was such a demand for trampolines? Arrangement has been "
+        "made to pick it up, if it falls through the trampoline will get reposted."
+        "\n\nAlon"})
                 ]
