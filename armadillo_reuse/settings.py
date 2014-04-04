@@ -24,6 +24,8 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
+REUSE_EMAIL_ADDRESS = 'shaladi@mit.edu'
+
 ALLOWED_HOSTS = []
 
 EMAIL_USE_TLS = True

@@ -1,85 +1,129 @@
 from django.views.generic import View
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
+from web_api.models import *
+from django.contrib.auth.models import User
+import jsonpickle
+from django.core import serializers
+from django.core.mail import send_mail
+from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS
 
 
-class ThreadGetView(View):
+class AbstractThreadView(View):
+    """ A base class for all Thread handler views.
+    """
+    def authenticate_user(self, request, *args, **kwargs):
+        """Authenticates user and if it is a valid request,
+        identifies and returns the client's User object
+
+        Returns None if authentication fails for whatever reason
+        """
+        return User.objects.all()[0]
+
+
+class ThreadGetView(AbstractThreadView):
     """This view handles client requests to get an
     update of all items that have been modified
     since the specified time as per client's request
 
     It queries and fetches data from database.
 
-    Expects get request from client as per the api
+    Expects GET request from client as per the api
     specifications.
     """
 
     def get(self, request, *args, **kwargs):
 
-        #Verify request validity and identify client
+        client = self.authenticate_user(request, *args, **kwargs)
 
-        #retrive the 'after' date as specified in the get request
+        if client is not None:
 
-        #query database to find all items that have been modified since 'after'
+            if not 'after' in request.GET:
+                return HttpResponseBadRequest("Cannot find 'after' attribute")
 
-        #send the retrieved list of items to client appropriately in JSON
+            after = request.GET['after']
+            update_items = Item.objects.all().filter(modified__gte=after)
 
-        response = "I'm sending you a list of items that have been modified since " + request.GET['after']
-        return HttpResponse(response)
+            response_items = serializers.serialize('json', update_items)
+
+            return HttpResponse(response_items)
+        else:
+            return HttpResponseForbidden("Invalid Request.")
 
 
-class ThreadPostView(View):
+class ThreadPostView(AbstractThreadView):
     """This view handles posting an new item
     into the system. It retrieves data from the request
     and creates a new thread and inserts an item into
     the appropriate place in database.
     It also sends an email to the reuse list for the post.
 
-    Expects a post request from client as per the api
+    Expects a POST request from client as per the api
     specifications
     """
 
     def post(self, request, *args, **kwargs):
 
-        #Verify request validity and identify client
+        client = self.authenticate_user(request, *args, **kwargs)
 
-        #extract data from request.POST and create item to be posted
+        if client is not None:
 
-        #create a new thread and add item to the thread and insert it
-        #into database
+            attributes = ['subject', 'text', 'name']
+            for attribute in attributes:
+                if not attribute in request.POST:
+                    return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
 
-        #send out email to the reuse list
+            subject = request.POST['subject']
+            sender = client.email
+            text = request.POST['text']
+            name = request.POST['name']
 
-        #send push notifications as necessary (may not be per each post).
+            new_thread = EmailThread.objects.create(subject=subject)
+            new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
+            new_item = Item.objects.create(name=name, post_email=new_email, thread=new_thread)
 
-        #send success/failure notification JSON to client
+            reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
 
-        response = "Wohoo, you're item has been posted. Yaay. "
-        return HttpResponse(response)
+            send_mail(subject, text, sender, reuse_list, fail_silently=False)
+            response = jsonpickle.encode({"success": True, "item":new_item.name})
+            return HttpResponse(response)
+        else:
+            return HttpResponseForbidden("Invalid Request.")
 
 
-class ThreadClaimView(View):
+class ThreadClaimView(AbstractThreadView):
     """This view handles claiming a reuse item.
     It sends email to reuse list on the appropriate thread.
 
-    Expects a post request from client as per the api
+    Expects a POST request from client as per the api
     specifications
     """
 
     def post(self, request, *args, **kwargs):
 
-        #Verify request validity and identify client
+        client = self.authenticate_user(request, *args, **kwargs)
 
-        #identify item to be claimed from request.POST
+        if client is not None:
 
-        #validate claim
+            if not 'item_id' in request.POST:
+                return HttpResponseBadRequest("Cannot find 'item_id' attribute")
 
-        #make the necessary modifications in the database
+            item_id = request.POST['item_id']
+            item = Item.objects.get(pk=item_id)
 
-        #send out email to the reuse list about claim on the appropriate thread
+            if item.claimed:
+                response = jsonpickle.encode({"success": False, "item": item.name})
+                return HttpResponse(response)
 
-        #send push notifications as necessary (may not be per each post).
+            item.claimed = True
+            item.save()
 
-        #send success/failure notification JSON to client
+            subject = "Re: " + item.thread.subject + " [CLAIMED]"
+            text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
+            sender = client.email
+            reuse_list = [REUSE_EMAIL_ADDRESS]
 
-        response = "You got it! Claimed! You now own 'Electronics Cruft'"
-        return HttpResponse(response)
+            send_mail(subject, text, sender, reuse_list, fail_silently=False)
+            response = jsonpickle.encode({"success": True, "item": item.name})
+            return HttpResponse(response)
+        else:
+            return HttpResponseForbidden("Invalid Request.")

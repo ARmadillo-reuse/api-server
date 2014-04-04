@@ -11,7 +11,6 @@ urlpatterns = patterns('',
     url(r'^post/$', ThreadPostView.as_view()),
 
     #direct claim request to ThreadClaimView
-    url(r'^claim/(?P<threadID>\w+)/(?P<itemID>\w+)$', ThreadClaimView.as_view()),
-
+    url(r'^claim/$', ThreadClaimView.as_view()),
 
 )
