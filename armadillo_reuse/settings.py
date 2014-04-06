@@ -31,11 +31,8 @@ ALLOWED_HOSTS = []
 
 #dynamically set smtp server
 if socket.gethostname() == "armadillo":
-    EMAIL_USE_TLS = True
-    EMAIL_HOST = 'smtp.armadillo.xvm.mit.edu'
+    EMAIL_HOST = 'localhost'
     EMAIL_PORT = 26
-    EMAIL_HOST_USER = 'armadillo@mit.edu'
-    EMAIL_HOST_PASSWORD = 'bratwurst'
     DEFAULT_FROM_EMAIL = 'no-reply@armadillo.xvm.mit.edu'
 else:
     EMAIL_USE_TLS = True
