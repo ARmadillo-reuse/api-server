@@ -8,11 +8,12 @@ from datetime import timedelta
 from math import sqrt
 import operator
 import re
+import nltk
 
 from django.db.models import Q
 import django.utils.timezone
 
-from web_api.models import EmailThread
+from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail
 
 
 class EmailParser(object):
@@ -31,16 +32,42 @@ class EmailParser(object):
                considered closed
         """
         self.thread_death_timeout = thread_death_timeout
+        self.building_regex = re.compile(r"[ENWOC]*\d+")
         pass
     
-    def parse_email_type(self, email):
+    def parse(self, email_dict):
+        """
+        Parse an email dictionary into one of {NewPostEmail, ClaimedItemEmail}
+        from web_api.models
+        """
+        
+        
+    def parse_email_type(self, email, thread):
         """
         Determine the type of object for the given email key-value dictionary.
         """
-        pass
+        if not thread:
+            return NewPostEmail
+        text = email["text"]
+        sent_tokens = nltk.sent_tokenize(text)
+        
+        sentences = [nltk.word_tokenize(s) for s in sent_tokens]
+        for sentence in sentences:
+            sent_pos = nltk.pos_tag(sentence)
+            for i, (word, pos) in enumerate(sent_pos):
+                if self.building_regex.match(word) and pos == "CD":
+                    if i > 0 and sent_pos[i-1][1] == "IN":
+                        return NewPostEmail
+                    if i > 1 and sent_pos[i-1][0].lower() == "room" and sent_pos[i-2][1] == "IN":
+                        return NewPostEmail
+                    
+        return ClaimedItemEmail
         
     
     def parse_email_thread(self, email):
+        """
+        Find the thread for a specific email message
+        """
         subject = re.sub(r"^\[?(re|fw):?\]?:?", "",
                          email["subject"], flags=re.IGNORECASE).strip()
 
