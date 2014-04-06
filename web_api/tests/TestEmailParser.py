@@ -2,13 +2,14 @@ import math
 
 from django.test import TestCase
 
-from web_api.models import EmailThread, NewPostEmail, Item
+from web_api.models import EmailThread, NewPostEmail, Item, ClaimedItemEmail
 from web_api.processing import EmailParser
 import django.utils.timezone
 import datetime
 
 
 class TestEmailParser(TestCase):
+    
     def test_can_pick_thread(self):
         for _id, subj in [(1, "This is the first thread"),
                          (2, "Second thread right here"),
@@ -51,4 +52,22 @@ class TestEmailParser(TestCase):
                             ("aabbaa", "aba", 1),
                             ("abc", "def", 0)]:
             self.assertEqual(parser.dot_dist(list(w1), list(w2)), val)
+    
+    def test_parses_email_type(self):
+        parser = EmailParser()
+        test_texts = [("I took the bike map", ClaimedItemEmail),
+                      ("claimed!", ClaimedItemEmail),
+                      ("Taken", ClaimedItemEmail),
+                      ("There are a bunch of mice, cables, and a couple of "
+                       "chairs available for re-use outside of 35-338.",
+                                NewPostEmail),
+                      ("Free 4x8 foot slate chalkboard outside room 38-145. "
+                       "It is large and heavy, you'll need at least 2 people "
+                       "to carry it away.", NewPostEmail)]
+        
+        for text, expected in test_texts:
+            email = {'text':text, 'from':'someone@mit.edu', 'subject':'test'}
+            ret_type = parser.parse_email_type(email, EmailThread())
+            self.assertEqual(expected, ret_type, "expected %s, got %s for '%s'"
+                             % (expected, ret_type, text))
         
