@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/1.6/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
+import socket
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -24,16 +25,25 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-REUSE_EMAIL_ADDRESS = 'shaladi@mit.edu'
+REUSE_EMAIL_ADDRESS = 'armadillo-test@mit.edu'
 
 ALLOWED_HOSTS = []
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'armadilloserver@gmail.com'
-EMAIL_HOST_PASSWORD = 'arma123dillo'
-DEFAULT_FROM_EMAIL = 'no-reply@reusemobile.mit.edu'
+#dynamically set smtp server
+if socket.gethostname() == "armadillo":
+    EMAIL_USE_TLS = True
+    EMAIL_HOST = 'smtp.armadillo.xvm.mit.edu'
+    EMAIL_PORT = 26
+    EMAIL_HOST_USER = 'armadillo@mit.edu'
+    EMAIL_HOST_PASSWORD = 'bratwurst'
+    DEFAULT_FROM_EMAIL = 'no-reply@armadillo.xvm.mit.edu'
+else:
+    EMAIL_USE_TLS = True
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = 'armadilloserver@gmail.edu'
+    EMAIL_HOST_PASSWORD = 'arma123dillo'
+    DEFAULT_FROM_EMAIL = 'no-reply@armadillo.xvm.mit.edu'
 
 
 # Application definition
@@ -54,7 +64,6 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -91,14 +100,17 @@ DATABASES = {}
 
 # Define DATABASES dynamically
 
-import socket
+SERVER_PORT = '8000'
+MAIN_URL = 'armadillo.xvm.mit.edu'
 
 # Force use of the development database for local versions
 if socket.gethostname() != "armadillo":
     DATABASES["default"] = ALL_DATABASES["local_test"]
+    MAIN_URL = 'localhost'
 else:
     if "unstable" in BASE_DIR:
         DATABASES["default"] = ALL_DATABASES["unstable"]
+        SERVER_PORT = '8001'
     else:
         DATABASES["default"] = ALL_DATABASES["stable"]
     
@@ -121,5 +133,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
-print DATABASES

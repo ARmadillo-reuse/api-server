@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate
+from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
 import hashlib
 import jsonpickle
 import socket
@@ -22,7 +23,6 @@ class SignupView(View):
         client_email = request.POST['email']
 
         if self.validate_mit_email(client_email):
-            #User.objects.all()[2].delete()
 
             #generate hashed token seed by email address.
             token = hashlib.sha224(client_email+"@armadillo.reuse").hexdigest()
@@ -34,14 +34,11 @@ class SignupView(View):
 
             verify_subject = "Your REUSE Mobile account verification"
 
-            main_url = "armadillo.xvm.mit.edu"
-            if socket.gethostname() != "armadillo":
-                main_url = "localhost"
-
-            verify_message = "Please verify your account here: http://%s:8000/api/login/verify/?username=%s&token=%s" % (main_url, client_email, token)
+            verify_message = "Please verify your account here: http://%s:%s/api/login/verify/?username=%s&token=%s" % (MAIN_URL, SERVER_PORT, client_email, token)
             verify_from = "no-reply@reusemobile.mit.edu"
             verify_to = [client_email]
 
+            #TODO: Fail loud?
             send_mail(verify_subject, verify_message, verify_from, verify_to, fail_silently=False)
 
             response = jsonpickle.encode({"success" : True})
