@@ -4,9 +4,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'armadillo_reuse.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+
+    #direct all api calls to the web_api application
+    url(r'^api/', include('web_api.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
 )

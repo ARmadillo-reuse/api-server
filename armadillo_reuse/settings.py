@@ -24,7 +24,16 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
+REUSE_EMAIL_ADDRESS = 'shaladi@mit.edu'
+
 ALLOWED_HOSTS = []
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'armadilloserver@gmail.com'
+EMAIL_HOST_PASSWORD = 'arma123dillo'
+DEFAULT_FROM_EMAIL = 'no-reply@reusemobile.mit.edu'
 
 
 # Application definition
@@ -37,13 +46,15 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'south',
-    'web_api'
+    'web_api',
+    'login',
+    'threads'
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
