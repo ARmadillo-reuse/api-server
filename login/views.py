@@ -72,9 +72,7 @@ class VerifyView(View):
         client_token = request.GET['token']
         client_username = request.GET['username']
         client_user = authenticate(username=client_username, password=client_token)
-        print client_token
-        print User.objects.all()[2].password
-        print client_user.is_active
+
         if client_user is not None and not client_user.is_active:
             client_user.is_active = True
             client_user.save()
