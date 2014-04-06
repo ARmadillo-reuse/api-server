@@ -6,7 +6,6 @@ from django.contrib.auth import authenticate
 from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
 import hashlib
 import jsonpickle
-import socket
 
 class SignupView(View):
     """This class handles all requests from client that
@@ -35,7 +34,7 @@ class SignupView(View):
             verify_subject = "Your REUSE Mobile account verification"
 
             verify_message = "Please verify your account here: http://%s:%s/api/login/verify/?username=%s&token=%s" % (MAIN_URL, SERVER_PORT, client_email, token)
-            verify_from = "no-reply@reusemobile.mit.edu"
+            verify_from = "no-reply@armadillo.xvm.mit.edu"
             verify_to = [client_email]
 
             #TODO: Fail loud?
