@@ -1,5 +1,7 @@
-from armadillo_reuse.settings import EMAIL_HOST, EMAIL_HOST_PASSWORD, EMAIL_HOST_USER, EMAIL_PORT, EMAIL_USE_TLS
+from armadillo_reuse.settings import EMAIL_HOST, EMAIL_HOST_PASSWORD, EMAIL_HOST_USER, EMAIL_PORT, EMAIL_USE_TLS, GCM_API_KEY
 import pyzmail
+import requests
+import jsonpickle
 
 
 def send_mail(sender, recipients, subject, text_content):
@@ -33,4 +35,30 @@ def send_mail(sender, recipients, subject, text_content):
         else:
             return 'success'
     else:
+
         return 'error: ' + ret + "\n\n "+ ' from: ' + mail_from + " host: " +smtp_host+" port: "+ str(smtp_port) + " mode: " + smtp_mode + " login: " + str(smtp_login) + " password: " + str(smtp_password)
+
+def send_gcm_message(reg_ids, data, collapse_key):
+    """Sends gcm message to devices in reg_ids
+    returns the json response from the gcm server
+    """
+    message = {
+        'registration_ids': reg_ids,
+        'collapse_key': collapse_key,
+        'data': data
+    }
+
+    message = jsonpickle.encode(message)
+
+    headers = {
+        'UserAgent': "GCM-Server",
+        'Content-Type': 'application/json',
+        'Authorization': 'key=' + GCM_API_KEY,
+    }
+
+    response = requests.post(url="https://android.googleapis.com/gcm/send",
+                             data=message,
+                             headers=headers)
+
+    return jsonpickle.decode(response.content)
+
