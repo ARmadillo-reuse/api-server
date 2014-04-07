@@ -22,7 +22,7 @@ class AbstractThreadView(View):
             username = request.META['HTTP_USERNAME']
             token = request.META['HTTP_TOKEN']
             client_user = authenticate(username=username, password=token)
-            if client_user.is_active:
+            if client_user is not None and client_user.is_active:
                 return client_user
             else:
                 return None
