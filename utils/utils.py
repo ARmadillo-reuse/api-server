@@ -31,6 +31,5 @@ def send_mail(sender, recipients, subject, text_content):
             return 'failed recipients:' + ','.join(ret.keys())
         else:
             return 'success'
-
     else:
         return 'error: ' + ret

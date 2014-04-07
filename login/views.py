@@ -1,5 +1,5 @@
 from django.views.generic import View
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
@@ -42,10 +42,15 @@ class SignupView(View):
 
             #TODO: Fail loud?
             #send_mail(verify_subject, verify_message, verify_from, verify_to, fail_silently=False)
-            send_mail(verify_from, verify_to, verify_subject, verify_message)
+            status = send_mail(verify_from, verify_to, verify_subject, verify_message)
 
-            response = jsonpickle.encode({"success": True})
-            return HttpResponse(response, content_type="application/json")
+            if status == "success":
+
+                response = jsonpickle.encode({"success": True})
+                return HttpResponse(response, content_type="application/json")
+            else:
+
+                return HttpResponseServerError("Please try again.")
         else:
             return HttpResponseForbidden("Invalid Request.")
 
