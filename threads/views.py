@@ -110,7 +110,7 @@ class ThreadPostView(AbstractThreadView):
                     lon = ''
                     lan = ''
 
-                new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, long=lon, is_email=False, thread=new_thread)
+                new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
 
                 response = jsonpickle.encode({"success": True})
                 return HttpResponse(response)
