@@ -16,7 +16,7 @@ def send_mail(sender, recipients, subject, text_content):
     smtp_password = EMAIL_HOST_PASSWORD if EMAIL_HOST_USER != '' else None
 
     payload, mail_from, rcpt_to, msg_id = pyzmail.compose_mail(
-        sender,
+        ("Reuse Mobile", sender),
         recipients,
         subject,
         prefered_encoding,
