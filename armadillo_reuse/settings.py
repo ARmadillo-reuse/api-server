@@ -38,7 +38,7 @@ else:
     EMAIL_USE_TLS = True
     EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_PORT = 587
-    EMAIL_HOST_USER = 'armadilloserver@gmail.edu'
+    EMAIL_HOST_USER = 'armadilloserver@gmail.com'
     EMAIL_HOST_PASSWORD = 'arma123dillo'
     DEFAULT_FROM_EMAIL = 'no-reply@armadillo.xvm.mit.edu'
 
