@@ -22,9 +22,13 @@ def send_mail(sender, recipients, subject, text_content):
         prefered_encoding,
         (text_content, text_encoding),
         html=None)
-
-    ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode,
+    
+    if smtp_login is None:
+        ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode)
+    else:
+        ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode,
                             smtp_login=smtp_login, smtp_password=smtp_password)
+
 
     if isinstance(ret, dict):
         if ret:
@@ -32,4 +36,4 @@ def send_mail(sender, recipients, subject, text_content):
         else:
             return 'success'
     else:
-        return 'error: ' + ret + "\n\n host: " +smtp_host+" port: "+ str(smtp_port) + " mode: " + smtp_mode + " login: " + smtp_login + " password: " + smtp_password
+        return 'error: ' + ret + "\n\n host: " +smtp_host+" port: "+ str(smtp_port) + " mode: " + smtp_mode + " login: " + str(smtp_login) + " password: " + str(smtp_password)
