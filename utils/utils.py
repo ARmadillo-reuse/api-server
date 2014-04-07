@@ -32,4 +32,4 @@ def send_mail(sender, recipients, subject, text_content):
         else:
             return 'success'
     else:
-        return 'error: ' + ret
+        return 'error: ' + ret + "\n\n host: " +smtp_host+" port: "+smtp_port + " mode: " + smtp_mode + " login: " + smtp_login + " password: " + smtp_password
