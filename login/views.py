@@ -1,12 +1,12 @@
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.contrib.auth import authenticate
 from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
 import hashlib
 import jsonpickle
 from validate_email import validate_email
+from utils.utils import send_mail
 
 class SignupView(View):
     """This class handles all requests from client that
@@ -41,7 +41,8 @@ class SignupView(View):
             verify_to = [client_email]
 
             #TODO: Fail loud?
-            send_mail(verify_subject, verify_message, verify_from, verify_to, fail_silently=False)
+            #send_mail(verify_subject, verify_message, verify_from, verify_to, fail_silently=False)
+            send_mail(verify_from, verify_to, verify_subject, verify_message)
 
             response = jsonpickle.encode({"success": True})
             return HttpResponse(response, content_type="application/json")
