@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
 import hashlib
 import jsonpickle
+from validate_email import validate_email
 
 class SignupView(View):
     """This class handles all requests from client that
@@ -26,8 +27,10 @@ class SignupView(View):
             #generate hashed token seed by email address.
             token = hashlib.sha224(client_email+"@armadillo.reuse").hexdigest()
 
+
             #TODO: include device id during initialization to set up GCM push notifications gcm_id?
             client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
+
             client_user.is_active = False
             client_user.save()
 
@@ -40,11 +43,10 @@ class SignupView(View):
             #TODO: Fail loud?
             send_mail(verify_subject, verify_message, verify_from, verify_to, fail_silently=False)
 
-            response = jsonpickle.encode({"success" : True})
+            response = jsonpickle.encode({"success": True})
             return HttpResponse(response, content_type="application/json")
         else:
             return HttpResponseForbidden("Invalid Request.")
-
 
     def validate_mit_email(self, email):
         """validates that email is not only a valid
@@ -52,8 +54,7 @@ class SignupView(View):
 
         returns true/false
         """
-
-        return True
+        return validate_email(email) and email.endswith("mit.edu")
 
 class VerifyView(View):
     """ This class receives verification requests sent

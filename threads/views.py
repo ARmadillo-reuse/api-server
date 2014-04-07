@@ -1,11 +1,11 @@
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from web_api.models import *
-from django.contrib.auth.models import User
 import jsonpickle
 from django.core import serializers
 from django.core.mail import send_mail
 from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS
+from django.contrib.auth import authenticate
 
 
 class AbstractThreadView(View):
@@ -17,7 +17,17 @@ class AbstractThreadView(View):
 
         Returns None if authentication fails for whatever reason
         """
-        return User.objects.all()[0]
+
+        if 'HTTP_USERNAME' in request.META and 'HTTP_TOKEN' in request.META:
+            username = request.META['HTTP_USERNAME']
+            token = request.META['HTTP_TOKEN']
+            client_user = authenticate(username=username, password=token)
+            if client_user.is_active:
+                return client_user
+            else:
+                return None
+
+        return None
 
 
 class ThreadGetView(AbstractThreadView):
