@@ -6,6 +6,7 @@ from django.core import serializers
 from utils.utils import send_mail
 from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS
 from django.contrib.auth import authenticate
+from web_api.location.ItemPostLocator import ItemPostLocator
 
 
 class AbstractThreadView(View):
@@ -77,14 +78,16 @@ class ThreadPostView(AbstractThreadView):
 
         if client is not None:
 
-            attributes = ['subject', 'text', 'name']
+            attributes = ['name', 'description', 'location', 'tags']
             for attribute in attributes:
                 if not attribute in request.POST:
                     return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
 
-            subject = request.POST['subject']
+            subject = request.POST['name']
             sender = client.email
-            text = request.POST['text']
+            shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
+            description = request.POST['description']
+            text = description + + "\n\n\n\n_______________________________________________\n"+shameless_plug
             name = request.POST['name']
 
             reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
@@ -92,9 +95,22 @@ class ThreadPostView(AbstractThreadView):
             status = send_mail(sender, reuse_list, subject, text)
 
             if status == 'success':
+                location = request.POST['location']
+                tags = request.POST['tags']
                 new_thread = EmailThread.objects.create(subject=subject)
                 new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
-                new_item = Item.objects.create(name=name, post_email=new_email, thread=new_thread)
+
+                ipl = ItemPostLocator()
+                data = ipl.get_location(location)
+
+                if ipl is not None:
+                    lon = str(data['lon'])
+                    lat = str(data['lat'])
+                else:
+                    lon = ''
+                    lan = ''
+
+                new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, long=lon, is_email=False, thread=new_thread)
 
                 response = jsonpickle.encode({"success": True})
                 return HttpResponse(response)
@@ -145,6 +161,7 @@ class ThreadClaimView(AbstractThreadView):
                 response = jsonpickle.encode({"success": True})
                 return HttpResponse(response)
             else:
+
                 #TODO: possible log errors
 
                 response = jsonpickle.encode({"success": False})

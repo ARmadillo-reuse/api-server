@@ -10,6 +10,24 @@ class Item(models.Model):
     #The name of this item
     name = models.CharField(max_length=256)
 
+    #description of item
+    description = models.TextField(default="", blank=True)
+
+    #location as XX-XXX string
+    location = models.CharField(max_length=256, blank=True, default="")
+
+    #tags as set when item is created
+    tags = models.TextField(default="", blank=True)
+
+    #latitude of item as string
+    lat = models.TextField(max_length=256, default="", blank=True)
+
+    #longitude of item as string
+    lon = models.TextField(max_length=256, default="", blank=True)
+
+    #whether this item was created from an email
+    is_email = models.BooleanField(default=False)
+
     #The NewPostEmail in which this Item was first mentioned
     post_email = models.ForeignKey('NewPostEmail')
 
