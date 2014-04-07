@@ -26,7 +26,7 @@ class Item(models.Model):
     lon = models.TextField(max_length=256, default="", blank=True)
 
     #whether this item was created from an email
-    is_email = models.BooleanField()
+    is_email = models.BooleanField(default=False)
 
     #The NewPostEmail in which this Item was first mentioned
     post_email = models.ForeignKey('NewPostEmail')
