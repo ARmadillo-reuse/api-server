@@ -87,7 +87,7 @@ class ThreadPostView(AbstractThreadView):
             sender = client.email
             shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
             description = request.POST['description']
-            text = description + + "\n\n\n\n_______________________________________________\n"+shameless_plug
+            text = description + "\n\n\n\n_______________________________________________\n"+shameless_plug
             name = request.POST['name']
 
             reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
