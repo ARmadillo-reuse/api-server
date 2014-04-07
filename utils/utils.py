@@ -16,17 +16,14 @@ def send_mail(sender, recipients, subject, text_content):
     smtp_password = EMAIL_HOST_PASSWORD if EMAIL_HOST_USER != '' else None
 
     payload, mail_from, rcpt_to, msg_id = pyzmail.compose_mail(
-        sender,
+        ("Reuse Mobile", sender),
         recipients,
         subject,
         prefered_encoding,
         (text_content, text_encoding),
         html=None)
-    
-    if smtp_login is None:
-        ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode)
-    else:
-        ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode,
+
+    ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode,
                             smtp_login=smtp_login, smtp_password=smtp_password)
 
 
@@ -36,4 +33,4 @@ def send_mail(sender, recipients, subject, text_content):
         else:
             return 'success'
     else:
-        return 'error: ' + ret + "\n\n host: " +smtp_host+" port: "+ str(smtp_port) + " mode: " + smtp_mode + " login: " + str(smtp_login) + " password: " + str(smtp_password)
+        return 'error: ' + ret + "\n\n "+ ' from: ' + mail_from + " host: " +smtp_host+" port: "+ str(smtp_port) + " mode: " + smtp_mode + " login: " + str(smtp_login) + " password: " + str(smtp_password)
