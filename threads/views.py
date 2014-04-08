@@ -101,14 +101,14 @@ class ThreadPostView(AbstractThreadView):
                 new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
 
                 ipl = ItemPostLocator()
-                data = ipl.get_location(location)
+                data = ipl.get_location(location.upper())
 
                 if ipl is not None:
                     lon = str(data['lon'])
                     lat = str(data['lat'])
                 else:
                     lon = ''
-                    lan = ''
+                    lat = ''
 
                 new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
 
