@@ -98,6 +98,11 @@ class NewPostEmail(AbstractEmail):
     #Can be a room number, an address, or something else
 
     location = models.CharField(max_length=256)
+    
+    def __getattr__(self, name):
+        if name== "items":
+            return self.item_set.all()
+        return super.__getattr__(self, name)
 
     
 class ClaimedItemEmail(AbstractEmail):
