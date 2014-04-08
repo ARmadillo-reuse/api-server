@@ -35,7 +35,7 @@ class EmailReceiver(asyncore.dispatcher):
     
     def handle_parsed_email(self, parsed):
         parsed.save()
-        
+
 
 def run():
     receiver = EmailReceiver('localhost', 7999)

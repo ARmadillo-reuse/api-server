@@ -8,3 +8,4 @@
 venv/*
 .idea/*
 .project
+smtp/pid

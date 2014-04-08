@@ -58,7 +58,8 @@ INSTALLED_APPS = (
     'south',
     'web_api',
     'login',
-    'threads'
+    'threads',
+    'smtp'
 )
 
 MIDDLEWARE_CLASSES = (
