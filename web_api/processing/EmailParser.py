@@ -8,12 +8,13 @@ from datetime import timedelta
 from math import sqrt
 import operator
 import re
-import nltk
 
 from django.db.models import Q
 import django.utils.timezone
+import nltk
 
-from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail
+from web_api.location.ItemPostLocator import ItemPostLocator
+from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail, Item
 
 
 class EmailParser(object):
@@ -32,7 +33,8 @@ class EmailParser(object):
                considered closed
         """
         self.thread_death_timeout = thread_death_timeout
-        self.building_regex = re.compile(r"[ENWOC]*\d+")
+        self.building_regex = re.compile(r"[ENWOC]{0,2}\d+(-[DG]?\d{2,})?$")
+        self.locator = ItemPostLocator()
         pass
     
     def parse(self, email_dict):
@@ -40,7 +42,82 @@ class EmailParser(object):
         Parse an email dictionary into one of {NewPostEmail, ClaimedItemEmail}
         from web_api.models
         """
+        thread = self.parse_email_thread(email_dict)
+        eml_type = self.parse_email_type(email_dict, thread)
+        if eml_type == ClaimedItemEmail:
+            return self.parse_claimed_item_email(email_dict, thread)
+        elif eml_type == NewPostEmail:
+            return self.parse_new_post_email(email_dict, thread)
+    
+    def parse_claimed_item_email(self, email, thread):
+        if not thread:
+            return None
         
+        for item in thread.items:
+            item.claimed = True
+            item.save()
+        
+        claimed_email = ClaimedItemEmail(subject=email["subject"],
+                                         thread=thread, text=email["text"],
+                                         items=thread.items)
+        
+        claimed_email.save()
+        
+    
+    def parse_new_post_email(self, email, thread):
+        if not thread:
+            thread = EmailThread.objects.create(subject=email["subject"])
+        
+        post_email = NewPostEmail(sender=email["from"],
+                                  subject=email["subject"],
+                                  text=email["text"],
+                                  thread=thread)
+        
+        item = Item(name=email["subject"], description=email["text"],
+                    is_email=True)
+        
+        location = self.get_location_string(email["text"])
+        if location:
+            post_email.location = location
+            loc = self.locator.get_location(location)
+            item.location = loc
+            if loc:
+                item.lat, item.lon = (loc["lat"], loc["lon"])
+        else:
+            post_email.location = "undetermined"
+        
+        thread.save()
+        post_email.save()
+        
+        item.post_email=post_email
+        item.save()
+        
+        return post_email
+    
+    
+    def get_location_string(self, text):
+        sentences = [nltk.word_tokenize(s) for s in nltk.sent_tokenize(text)]
+        
+        possible = []
+        
+        for sentence in sentences:
+            sent_pos = nltk.pos_tag(sentence)
+            for i, (word, pos) in enumerate(sent_pos):
+                if self.building_regex.match(word) and pos == "CD":
+                    if i > 0 and sent_pos[i-1][1] == "IN":
+                        possible.append(word)
+                        
+                    elif i > 1 and sent_pos[i-1][0].lower() in ["room", "building"] \
+                             and sent_pos[i-2][1] == "IN":
+                        possible.append(word)
+                    
+                    elif i == 1 and sent_pos[0][1] == "JJ":
+                        possible.append(word)
+        
+        if possible:
+            return max(possible, key=lambda x: len(x))
+        else:
+            return None
         
     def parse_email_type(self, email, thread):
         """
@@ -48,18 +125,9 @@ class EmailParser(object):
         """
         if not thread:
             return NewPostEmail
-        text = email["text"]
-        sent_tokens = nltk.sent_tokenize(text)
         
-        sentences = [nltk.word_tokenize(s) for s in sent_tokens]
-        for sentence in sentences:
-            sent_pos = nltk.pos_tag(sentence)
-            for i, (word, pos) in enumerate(sent_pos):
-                if self.building_regex.match(word) and pos == "CD":
-                    if i > 0 and sent_pos[i-1][1] == "IN":
-                        return NewPostEmail
-                    if i > 1 and sent_pos[i-1][0].lower() == "room" and sent_pos[i-2][1] == "IN":
-                        return NewPostEmail
+        if self.get_location_string(email["text"]):
+            return NewPostEmail
                     
         return ClaimedItemEmail
         

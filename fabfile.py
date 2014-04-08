@@ -41,6 +41,9 @@ def deploy(state="unstable",app="web_api"):
                     run("python manage.py migrate %s" % app)
                     print "Running tests"
                     run("python manage.py test")
+                    print "Starting SMTP relay client"
+                    run("python smtp/EmailReceiver.py&")
+
         print "Restarting web server"
         run("touch armadillo_reuse/wsgi.py")
 
