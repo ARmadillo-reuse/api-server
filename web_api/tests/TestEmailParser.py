@@ -71,3 +71,61 @@ class TestEmailParser(TestCase):
             self.assertEqual(expected, ret_type, "expected %s, got %s for '%s'"
                              % (expected, ret_type, text))
         
+    def test_parses_post_email(self):
+        parser = EmailParser()
+        test_emails = [({'subject': "Broken rice cooker",
+                         'from': 'vxiao@mit.edu', 'text': "Broken "
+                         "black & decker rice cooker. Made about 2-3 cups "
+                         "of rice. Won't turn on when plugged in, but maybe "
+                         "you could use it for parts?"},
+                        {'subject': "Broken rice cooker",
+                         'sender': 'vxiao@mit.edu',
+                         'text': "Broken "
+                         "black & decker rice cooker. Made about 2-3 cups "
+                         "of rice. Won't turn on when plugged in, but maybe "
+                         "you could use it for parts?",
+                         'received': django.utils.timezone.now(),
+                         'modified': django.utils.timezone.now(),
+                         'thread': {'subject': "Broken rice cooker",
+                                    'modified': django.utils.timezone.now()},
+                         'location': 'undetermined',
+                         'items': [{'lat': '', 'lon': ''}] 
+                         }),
+                       ({"subject": "pair of shoes",
+                         'from': "jsamuels@mit.edu",
+                         'text': "Geier Wally loafers, heavy soled black.  "
+                                 "Missing buckle but ready to be personalized. "
+                                 "Size 40.  Outside 7-238 Rotch Library."},
+                        {'subject': "pair of shoes",
+                         'sender': "jsamuels@mit.edu",
+                         'text': "Geier Wally loafers, heavy soled black.  "
+                                "Missing buckle but ready to be personalized. "
+                                "Size 40.  Outside 7-238 Rotch Library.",
+                         'received': django.utils.timezone.now(),
+                         'modified': django.utils.timezone.now(),
+                         'thread': {'subject': 'pair of shoes',
+                                    'modified': django.utils.timezone.now()},
+                         'location': '7-238',
+                         'items': [{'lat': '42.35928952', 'lon': '-71.09317868'}],
+                         })
+                       ]
+        asserts = {datetime.datetime: lambda x,y:
+                        self.assertTrue(abs(x-y) < datetime.timedelta(0,.5))}
+        
+        for email, expected in test_emails:
+            parsed = parser.parse(email)
+            self.assertPropertiesEqual(parsed, expected, asserts)
+
+    def assertPropertiesEqual(self, obj, expected, asserts={}):
+        for key, value in expected.iteritems():
+            self.assertTrue(hasattr(obj, key),
+                            "Expected %s to have property %s" % (str(obj), key))
+            if type(value) == dict:
+                self.assertPropertiesEqual(getattr(obj, key), value, asserts)
+            elif type(value) == list:
+                for item, exp in zip(getattr(obj, key), value):
+                    self.assertPropertiesEqual(item, exp, asserts)
+            elif type(value) in asserts:
+                asserts[type(value)](getattr(obj, key), value)
+            else:
+                self.assertEqual(getattr(obj, key), value)
