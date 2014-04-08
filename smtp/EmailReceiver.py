@@ -17,18 +17,24 @@ class EmailReceiver(asyncore.dispatcher):
         self.buffer = ""
         self.preprocessor = EmailPreProcessor()
         self.parser = EmailParser()
+        self.log = open("EmailReceiver.log","a")
+
     
     def handle_read(self):
         self.buffer += self.recv(8192)
         print len(self.buffer)
         if "\x00" in self.buffer:
             email = self.buffer[:self.buffer.find('\x00')]
-            self.parse_incoming_email(email)
+            try:
+                self.parse_incoming_email(email)
+            except Exception as e:
+                self.log.write(str(e))
+                self.log.flush()
             self.buffer = self.buffer[len(email)+1:]
     
     def parse_incoming_email(self, email_pickle):
         email = pickle.loads(email_pickle)
-        text = email["text"]
+        text = email["data"]
         processed = self.preprocessor.parse(text)
         parsed = self.parser.parse(processed)
         self.handle_parsed_email(parsed)
