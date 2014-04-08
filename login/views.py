@@ -1,12 +1,12 @@
 from django.views.generic import View
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.contrib.auth import authenticate
 from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
 import hashlib
 import jsonpickle
 from validate_email import validate_email
+from utils.utils import send_mail
 
 class SignupView(View):
     """This class handles all requests from client that
@@ -27,13 +27,6 @@ class SignupView(View):
             #generate hashed token seed by email address.
             token = hashlib.sha224(client_email+"@armadillo.reuse").hexdigest()
 
-
-            #TODO: include device id during initialization to set up GCM push notifications gcm_id?
-            client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
-
-            client_user.is_active = False
-            client_user.save()
-
             verify_subject = "Your REUSE Mobile account verification"
 
             verify_message = "Please verify your account here: http://%s:%s/api/login/verify/?username=%s&token=%s" % (MAIN_URL, SERVER_PORT, client_email, token)
@@ -41,10 +34,22 @@ class SignupView(View):
             verify_to = [client_email]
 
             #TODO: Fail loud?
-            send_mail(verify_subject, verify_message, verify_from, verify_to, fail_silently=False)
 
-            response = jsonpickle.encode({"success": True})
-            return HttpResponse(response, content_type="application/json")
+            status = send_mail(verify_from, verify_to, verify_subject, verify_message)
+
+            if status == "success":
+                #TODO: include device id during initialization to set up GCM push notifications gcm_id?
+                client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
+
+                client_user.is_active = False
+                client_user.save()
+
+
+                response = jsonpickle.encode({"success": True})
+                return HttpResponse(response, content_type="application/json")
+            else:
+
+                return HttpResponseServerError("Please try again." + "\n\n\n" + status)
         else:
             return HttpResponseForbidden("Invalid Request.")
 

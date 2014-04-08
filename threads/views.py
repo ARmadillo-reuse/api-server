@@ -3,9 +3,10 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from web_api.models import *
 import jsonpickle
 from django.core import serializers
-from django.core.mail import send_mail
+from utils.utils import send_mail
 from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS
 from django.contrib.auth import authenticate
+from web_api.location.ItemPostLocator import ItemPostLocator
 
 
 class AbstractThreadView(View):
@@ -77,25 +78,47 @@ class ThreadPostView(AbstractThreadView):
 
         if client is not None:
 
-            attributes = ['subject', 'text', 'name']
+            attributes = ['name', 'description', 'location', 'tags']
             for attribute in attributes:
                 if not attribute in request.POST:
                     return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
 
-            subject = request.POST['subject']
+            subject = request.POST['name']
             sender = client.email
-            text = request.POST['text']
+            shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
+            description = request.POST['description']
+            text = description + "\n\n\n\n_______________________________________________\n"+shameless_plug
             name = request.POST['name']
-
-            new_thread = EmailThread.objects.create(subject=subject)
-            new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
-            new_item = Item.objects.create(name=name, post_email=new_email, thread=new_thread)
 
             reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
 
-            send_mail(subject, text, sender, reuse_list, fail_silently=False)
-            response = jsonpickle.encode({"success": True, "item":new_item.name})
-            return HttpResponse(response)
+            status = send_mail(sender, reuse_list, subject, text)
+
+            if status == 'success':
+                location = request.POST['location']
+                tags = request.POST['tags']
+                new_thread = EmailThread.objects.create(subject=subject)
+                new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
+
+                ipl = ItemPostLocator()
+                data = ipl.get_location(location.upper())
+
+                if ipl is not None:
+                    lon = str(data['lon'])
+                    lat = str(data['lat'])
+                else:
+                    lon = ''
+                    lat = ''
+
+                new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
+
+                response = jsonpickle.encode({"success": True})
+                return HttpResponse(response)
+            else:
+
+                response = jsonpickle.encode({"success": False})
+                return HttpResponse(response)
+
         else:
             return HttpResponseForbidden("Invalid Request.")
 
@@ -121,19 +144,28 @@ class ThreadClaimView(AbstractThreadView):
             item = Item.objects.get(pk=item_id)
 
             if item.claimed:
-                response = jsonpickle.encode({"success": False, "item": item.name})
+                response = jsonpickle.encode({"success": False})
                 return HttpResponse(response)
-
-            item.claimed = True
-            item.save()
 
             subject = "Re: " + item.thread.subject + " [CLAIMED]"
             text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
             sender = client.email
             reuse_list = [REUSE_EMAIL_ADDRESS]
 
-            send_mail(subject, text, sender, reuse_list, fail_silently=False)
-            response = jsonpickle.encode({"success": True, "item": item.name})
-            return HttpResponse(response)
+            status = send_mail(sender, reuse_list, subject, text)
+
+            if status == "success":
+                item.claimed = True
+                item.save()
+
+                response = jsonpickle.encode({"success": True})
+                return HttpResponse(response)
+            else:
+
+                #TODO: possible log errors
+
+                response = jsonpickle.encode({"success": False})
+                return HttpResponse(response)
+
         else:
             return HttpResponseForbidden("Invalid Request.")
