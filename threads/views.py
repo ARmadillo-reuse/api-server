@@ -4,9 +4,10 @@ from web_api.models import *
 import jsonpickle
 from django.core import serializers
 from utils.utils import send_mail
-from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS
+from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS, MAIN_URL
 from django.contrib.auth import authenticate
 from web_api.location.ItemPostLocator import ItemPostLocator
+import time
 
 
 class AbstractThreadView(View):
@@ -89,15 +90,17 @@ class ThreadPostView(AbstractThreadView):
             description = request.POST['description']
             text = description + "\n\n\n\n_______________________________________________\n"+shameless_plug
             name = request.POST['name']
+            thread_id = str(time.time())+"@"+MAIN_URL
+            headers = [('REUSE-MOBILE', 'true'), ('Message-ID', thread_id)]
 
             reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
 
-            status = send_mail(sender, reuse_list, subject, text)
+            status = send_mail(sender, reuse_list, subject, text, headers)
 
             if status == 'success':
                 location = request.POST['location']
                 tags = request.POST['tags']
-                new_thread = EmailThread.objects.create(subject=subject)
+                new_thread = EmailThread.objects.create(subject=subject, thread_id=thread_id)
                 new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
 
                 ipl = ItemPostLocator()
@@ -147,12 +150,18 @@ class ThreadClaimView(AbstractThreadView):
                 response = jsonpickle.encode({"success": False})
                 return HttpResponse(response)
 
-            subject = "Re: " + item.thread.subject + " [CLAIMED]"
-            text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
+            subject = "Re: " + item.thread.subject
+            text = "[CLAIMED!]\n\n" + item.post_email.text
             sender = client.email
             reuse_list = [REUSE_EMAIL_ADDRESS]
+            thread_id = item.thread.thread_id
+            msg_id = str(time.time())+"@"+MAIN_URL
+            headers = [('REUSE-MOBILE', 'true'), ('Message-ID', msg_id)]
 
-            status = send_mail(sender, reuse_list, subject, text)
+            if thread_id != '':
+                headers.append(('In-Reply-To', thread_id))
+
+            status = send_mail(sender, reuse_list, subject, text, headers)
 
             if status == "success":
                 item.claimed = True
@@ -168,4 +177,5 @@ class ThreadClaimView(AbstractThreadView):
                 return HttpResponse(response)
 
         else:
+
             return HttpResponseForbidden("Invalid Request.")

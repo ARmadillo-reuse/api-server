@@ -2,7 +2,7 @@ from armadillo_reuse.settings import EMAIL_HOST, EMAIL_HOST_PASSWORD, EMAIL_HOST
 import pyzmail
 
 
-def send_mail(sender, recipients, subject, text_content):
+def send_mail(sender, recipients, subject, text_content, headers=[]):
     """
     Sends email using pyzmail
     """
@@ -21,7 +21,7 @@ def send_mail(sender, recipients, subject, text_content):
         subject,
         prefered_encoding,
         (text_content, text_encoding),
-        html=None)
+        html=None, headers=headers)
 
     ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode,
                             smtp_login=smtp_login, smtp_password=smtp_password)
