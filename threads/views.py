@@ -103,7 +103,7 @@ class ThreadPostView(AbstractThreadView):
                 ipl = ItemPostLocator()
                 data = ipl.get_location(location.upper())
 
-                if ipl is not None:
+                if data is not None:
                     lon = str(data['lon'])
                     lat = str(data['lat'])
                 else:
