@@ -2,11 +2,14 @@ from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
+from armadillo_reuse.settings import SERVER_PORT, MAIN_URL, DEBUG
 import hashlib
 import jsonpickle
 from validate_email import validate_email
 from utils.utils import send_gcm_message, send_mail
+import logging
+logger = logging.getLogger('armadillo')
+
 
 class SignupView(View):
     """This class handles all requests from client that
@@ -19,42 +22,49 @@ class SignupView(View):
     """
 
     def post(self, request, *args, **kwargs):
+        try:
+            client_email = request.POST['email']
+            client_gcm_id = request.POST['gcm_id']
 
-        client_email = request.POST['email']
-        client_gcm_id = request.POST['gcm_id']
+            if self.validate_mit_email(client_email):
 
-        if self.validate_mit_email(client_email):
+                #generate hashed token seed by email address.
+                token = hashlib.sha224(client_email+"@armadillo.reuse").hexdigest()
 
-            #generate hashed token seed by email address.
-            token = hashlib.sha224(client_email+"@armadillo.reuse").hexdigest()
+                verify_subject = "Your REUSE Mobile account verification"
 
-            verify_subject = "Your REUSE Mobile account verification"
+                verify_message = "Please verify your account here: http://%s:%s/api/login/verify/?username=%s&token=%s" % (MAIN_URL, SERVER_PORT, client_email, token)
+                verify_from = "no-reply@armadillo.xvm.mit.edu"
+                verify_to = [client_email]
 
-            verify_message = "Please verify your account here: http://%s:%s/api/login/verify/?username=%s&token=%s" % (MAIN_URL, SERVER_PORT, client_email, token)
-            verify_from = "no-reply@armadillo.xvm.mit.edu"
-            verify_to = [client_email]
+                #TODO: Fail loud?
 
-            status = send_mail(verify_from, verify_to, verify_subject, verify_message)
+                status = send_mail(verify_from, verify_to, verify_subject, verify_message)
 
-            if status == "success":
+                if status == "success":
+                    #TODO: include device id during initialization to set up GCM push notifications gcm_id?
+                    client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
 
-                client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
+                    client_user.is_active = False
+                    client_user.Gcm.gcm_id = client_gcm_id
+                    client_user.Gcm.save()
+                    client_user.save()
 
-                client_user.is_active = False
-                client_user.Gcm.gcm_id = client_gcm_id
-                client_user.Gcm.save()
-                client_user.save()
+                    #Send gcm token
+                    data = {'token': token}
+                    res = send_gcm_message([client_gcm_id], data, 'token')
 
-                data = {'token': token}
-                res = send_gcm_message([client_gcm_id], data, 'token')
-
-                response = jsonpickle.encode({"success": True})
-                return HttpResponse(response, content_type="application/json")
+                    response = jsonpickle.encode({"success": True})
+                    return HttpResponse(response, content_type="application/json")
+                else:
+                    logger.error("SIGNUP: " + status + '\n\n')
+                    return HttpResponseServerError("Please try again." + "\n\n\n" + status)
             else:
+                return HttpResponseForbidden("Invalid Request.")
 
-                return HttpResponseServerError("Please try again." + "\n\n\n" + status)
-        else:
-            return HttpResponseForbidden("Invalid Request.")
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponseServerError(e if DEBUG else "An error has occured.")
 
     def validate_mit_email(self, email):
         """validates that email is not only a valid
@@ -62,7 +72,12 @@ class SignupView(View):
 
         returns true/false
         """
-        return validate_email(email) and (email.endswith(".mit.edu") or email.endswith("@mit.edu"))
+        ans = validate_email(email) and (email.endswith(".mit.edu") or email.endswith("@mit.edu"))
+        if ans:
+            return True
+        else:
+            logger.info("VALIDATE: User with email address " + email + " denied sign up." + '\n\n')
+            return False
 
 class VerifyView(View):
     """ This class receives verification requests sent
@@ -74,18 +89,24 @@ class VerifyView(View):
 
     def get(self, request, *args, **kwargs):
 
-        client_token = request.GET['token']
-        client_username = request.GET['username']
-        client_user = authenticate(username=client_username, password=client_token)
+        try:
+            client_token = request.GET['token']
+            client_username = request.GET['username']
+            client_user = authenticate(username=client_username, password=client_token)
 
-        if client_user is not None and not client_user.is_active:
-            client_user.is_active = True
-            client_user.save()
+            if client_user is not None and not client_user.is_active:
+                client_user.is_active = True
+                client_user.save()
 
-            #TODO: push token to client device. client.gcm_id ?
+                #TODO: push token to client device. client.gcm_id ?
 
-            response = "Thank you for verifying your account, %s. Enjoy using Reuse Mobile." % client_user.username
+                response = "Thank you for verifying your account, %s. Enjoy using Reuse Mobile." % client_user.username
 
-            return HttpResponse(response, content_type="text/plain")
-        else:
-            return HttpResponseForbidden("Invalid Request.")
+                return HttpResponse(response, content_type="text/plain")
+            else:
+                logger.info("VERIFY: User with USERNAME: " + client_username + " TOKEN: " + client_token + " denied verification." + '\n\n')
+                return HttpResponseForbidden("Invalid Request.")
+
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponseServerError(e if DEBUG else "An error has occured.")
