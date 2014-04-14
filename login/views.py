@@ -49,10 +49,6 @@ class SignupView(View):
                     client_gcm_user = GcmUser.objects.create(user=client_user, gcm_id=client_gcm_id)
                     client_user.save()
 
-                    #Send gcm token
-                    data = {'token': token}
-                    res = send_gcm_message([client_gcm_id], data, 'token')
-
                     response = jsonpickle.encode({"success": True})
                     return HttpResponse(response, content_type="application/json")
                 else:
@@ -97,7 +93,10 @@ class VerifyView(View):
                 client_user.is_active = True
                 client_user.save()
 
-                #TODO: push token to client device. client.gcm_id ?
+                #Send gcm token
+                data = {'token': client_token}
+                client_gcm_id = GcmUser.objects.get(user=client_user).gcm_id
+                res = send_gcm_message([client_gcm_id], data, 'token')
 
                 response = "Thank you for verifying your account, %s. Enjoy using Reuse Mobile." % client_user.username
 
