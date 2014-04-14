@@ -128,8 +128,8 @@ class ThreadPostView(AbstractThreadView):
                         #Notify all clients of change, pull from server
                         data = {'action' : 'pull'}
                         reg_ids = []
-                        for user in User.objects.all():
-                            reg_ids.append(user.Gcm.gcm_id)
+                        for entry in GcmUser.objects.all():
+                            reg_ids.append(entry.gcm_id)
                         res = send_gcm_message(reg_ids, data, 'pull')
 
                         response = jsonpickle.encode({"success": True})
@@ -192,8 +192,8 @@ class ThreadClaimView(AbstractThreadView):
                     #Notify all clients of change, pull from server
                     data = {'action' : 'pull'}
                     reg_ids = []
-                    for user in User.objects.all():
-                        reg_ids.append(user.Gcm.gcm_id)
+                    for entry in GcmUser.objects.all():
+                        reg_ids.append(entry.gcm_id)
                     res = send_gcm_message(reg_ids, data, 'pull')
 
                     response = jsonpickle.encode({"success": True})
