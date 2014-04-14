@@ -1,11 +1,10 @@
-from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
 
 
-class Gcm(models.Model):
-    user = models.OneToOneField(User)
+class GcmUser(models.Model):
+    user = models.ForeignKey('auth.User')
     gcm_id = models.CharField(max_length=512)
 
 

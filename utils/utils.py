@@ -42,6 +42,7 @@ def send_gcm_message(reg_ids, data, collapse_key):
     """Sends gcm message to devices in reg_ids
     returns the json response from the gcm server
     """
+
     message = {
         'registration_ids': reg_ids,
         'collapse_key': collapse_key,
@@ -59,6 +60,4 @@ def send_gcm_message(reg_ids, data, collapse_key):
     response = requests.post(url="https://android.googleapis.com/gcm/send",
                              data=message,
                              headers=headers)
-
-    return jsonpickle.decode(response.content)
-
+    return response.status_code

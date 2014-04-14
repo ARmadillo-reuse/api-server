@@ -1,5 +1,6 @@
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
+from web_api.models import GcmUser
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from armadillo_reuse.settings import SERVER_PORT, MAIN_URL, DEBUG
@@ -44,10 +45,8 @@ class SignupView(View):
                 if status == "success":
                     #TODO: include device id during initialization to set up GCM push notifications gcm_id?
                     client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
-
                     client_user.is_active = False
-                    client_user.Gcm.gcm_id = client_gcm_id
-                    client_user.Gcm.save()
+                    client_gcm_user = GcmUser.objects.create(user=client_user, gcm_id=client_gcm_id)
                     client_user.save()
 
                     #Send gcm token
