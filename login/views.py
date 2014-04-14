@@ -6,7 +6,7 @@ from armadillo_reuse.settings import SERVER_PORT, MAIN_URL
 import hashlib
 import jsonpickle
 from validate_email import validate_email
-from utils.utils import send_mail
+from utils.utils import send_gcm_message, send_mail
 
 class SignupView(View):
     """This class handles all requests from client that
@@ -21,6 +21,7 @@ class SignupView(View):
     def post(self, request, *args, **kwargs):
 
         client_email = request.POST['email']
+        client_gcm_id = request.POST['gcm_id']
 
         if self.validate_mit_email(client_email):
 
@@ -33,17 +34,19 @@ class SignupView(View):
             verify_from = "no-reply@armadillo.xvm.mit.edu"
             verify_to = [client_email]
 
-            #TODO: Fail loud?
-
             status = send_mail(verify_from, verify_to, verify_subject, verify_message)
 
             if status == "success":
-                #TODO: include device id during initialization to set up GCM push notifications gcm_id?
+
                 client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
 
                 client_user.is_active = False
+                client_user.Gcm.gcm_id = client_gcm_id
+                client_user.Gcm.save()
                 client_user.save()
 
+                data = {'token': token}
+                res = send_gcm_message([client_gcm_id], data, 'token')
 
                 response = jsonpickle.encode({"success": True})
                 return HttpResponse(response, content_type="application/json")
@@ -59,7 +62,7 @@ class SignupView(View):
 
         returns true/false
         """
-        return validate_email(email) and email.endswith("mit.edu")
+        return validate_email(email) and (email.endswith(".mit.edu") or email.endswith("@mit.edu"))
 
 class VerifyView(View):
     """ This class receives verification requests sent

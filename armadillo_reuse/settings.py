@@ -27,6 +27,8 @@ TEMPLATE_DEBUG = True
 
 REUSE_EMAIL_ADDRESS = 'armadillo-test@mit.edu'
 
+GCM_API_KEY = 'AIzaSyDSSl8EK8t0xwUEgrYAcT0C84YGaDXafEY'
+
 ALLOWED_HOSTS = []
 
 #dynamically set smtp server
