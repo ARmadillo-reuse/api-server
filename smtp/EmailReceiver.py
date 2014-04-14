@@ -33,8 +33,14 @@ class EmailReceiver(asyncore.dispatcher):
             self.buffer = self.buffer[len(email)+1:]
     
     def parse_incoming_email(self, email_pickle):
+        self.log.write("Parsing incoming")
         email = pickle.loads(email_pickle)
         text = email["data"]
+        try:
+            self.log.write("subject: %s" % email["subject"])
+        except Exception as e:
+            pass
+        self.log.flush()
         processed = self.preprocessor.parse(text)
         parsed = self.parser.parse(processed)
         self.handle_parsed_email(parsed)
