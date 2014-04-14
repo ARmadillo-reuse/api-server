@@ -1,6 +1,13 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
+
+
+class Gcm(models.Model):
+    user = models.OneToOneField(User)
+    gcm_id = models.CharField(max_length=512)
+
 
 class Item(models.Model):
     """
@@ -125,6 +132,11 @@ class EmailThread(models.Model):
     # manually.
     #When the thread was last updated
     modified = models.DateTimeField(null=True)
+
+    #This id value can be used for sending claimed emails to the same
+    #tread by usting its value as "In-Reply-To: <value>" in the email
+    #header. Read more here: http://www.rfc-editor.org/rfc/rfc5322.txt
+    thread_id = models.CharField(max_length=256, default="", blank=True)
 
 
 
