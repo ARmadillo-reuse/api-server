@@ -1,6 +1,7 @@
 import asyncore
 import pickle
 import socket
+import traceback
 from web_api.processing.EmailPreProcessor import EmailPreProcessor
 from web_api.processing.EmailParser import EmailParser
 
@@ -28,7 +29,8 @@ class EmailReceiver(asyncore.dispatcher):
             try:
                 self.parse_incoming_email(email)
             except Exception as e:
-                self.log.write(str(e))
+                self.log.write("\n")
+                self.log.write(traceback.format_exc(e))
                 self.log.flush()
             self.buffer = self.buffer[len(email)+1:]
     

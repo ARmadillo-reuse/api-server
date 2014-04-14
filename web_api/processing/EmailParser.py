@@ -53,15 +53,17 @@ class EmailParser(object):
         if not thread:
             return None
         
-        for item in thread.items:
+        for item in thread.item_set.all():
             item.claimed = True
             item.save()
         
         claimed_email = ClaimedItemEmail(subject=email["subject"],
-                                         thread=thread, text=email["text"],
-                                         items=thread.items)
-        
+                                         thread=thread, text=email["text"])
+
         claimed_email.save()
+        claimed_email.items = thread.item_set.all()
+        claimed_email.save()
+        return claimed_email
         
     
     def parse_new_post_email(self, email, thread):
