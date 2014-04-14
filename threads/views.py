@@ -10,7 +10,7 @@ from web_api.location.ItemPostLocator import ItemPostLocator
 import time
 import logging
 logger = logging.getLogger('armadillo')
-
+userlogger = logging.getLogger('userlog')
 
 class AbstractThreadView(View):
     """ A base class for all Thread handler views.
@@ -208,3 +208,27 @@ class ThreadClaimView(AbstractThreadView):
         except Exception as e:
                     logger.exception(str(e))
                     return HttpResponseServerError(e if DEBUG else "An error has occured.")
+
+
+class ThreadLogView(AbstractThreadView):
+    """ Recieves log data from client.
+
+    Expects a post request.
+    """
+
+    def post(self, request, *args, **kwargs):
+
+        client = self.authenticate_user(request, *args, **kwargs)
+        
+        if client is not None:
+            log_event = request.POST['log_event']
+            log_details = request.POST['log_details']
+            userlogger.info("User : " + client.username + " Event : " + log_event.upper() + " ==> " + log_details)
+            response = jsonpickle.encode({"success": True})
+            return HttpResponse(response)
+        else:
+            return HttpResponseForbidden("Invalid Request.")
+
+
+
+

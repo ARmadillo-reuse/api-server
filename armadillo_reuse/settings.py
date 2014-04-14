@@ -112,21 +112,37 @@ LOGGING = {
         },
     },
     'handlers': {
+        'djangofile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'armadillo_django.log',
+            'formatter': 'verbose'
+        },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'armadillo.log',
             'formatter': 'verbose'
         },
+        'userfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'userlog.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['djangofile'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'armadillo': {
             'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'userlog' : {
+            'handlers': ['userfile'],
             'level': 'DEBUG',
         },
     }

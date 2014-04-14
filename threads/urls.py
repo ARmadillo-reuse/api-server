@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from views import ThreadGetView, ThreadPostView, ThreadClaimView
+from views import ThreadGetView, ThreadPostView, ThreadClaimView, ThreadLogView
 
 urlpatterns = patterns('',
 
@@ -12,5 +12,8 @@ urlpatterns = patterns('',
 
     #direct claim request to ThreadClaimView
     url(r'^claim/$', ThreadClaimView.as_view()),
+
+    #direct logging request to ThreadLogView (log client data for user testing)
+    url(r'^log/$', ThreadLogView.as_view()),
 
 )
