@@ -29,7 +29,7 @@ REUSE_EMAIL_ADDRESS = 'armadillo-test@mit.edu'
 
 GCM_API_KEY = 'AIzaSyDSSl8EK8t0xwUEgrYAcT0C84YGaDXafEY'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 #dynamically set smtp server
 if socket.gethostname() == "armadillo":
@@ -166,8 +166,7 @@ else:
     else:
         DATABASES["default"] = ALL_DATABASES["stable"]
         #Debug will not be available in production
-        DEBUG = False
-    
+        DEBUG = False 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
