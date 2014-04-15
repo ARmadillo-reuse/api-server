@@ -26,13 +26,15 @@ class EmailReceiver(asyncore.dispatcher):
         print len(self.buffer)
         if "\x00" in self.buffer:
             email = self.buffer[:self.buffer.find('\x00')]
-            try:
-                self.parse_incoming_email(email)
-            except Exception as e:
-                self.log.write("\n")
-                self.log.write(traceback.format_exc(e))
-                self.log.flush()
-            self.buffer = self.buffer[len(email)+1:]
+            if email:
+                try:
+                    self.parse_incoming_email(email)
+                except Exception as e:
+                    self.log.write("\n")
+                    self.log.write("parsing '%s'\n" % email)
+                    self.log.write(traceback.format_exc(e))
+                    self.log.flush()
+            self.buffer = self.buffer[(self.buffer.find('\x00')+1):]
     
     def parse_incoming_email(self, email_pickle):
         self.log.write("Parsing incoming")
