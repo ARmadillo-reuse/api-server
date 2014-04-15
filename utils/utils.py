@@ -2,7 +2,7 @@ from armadillo_reuse.settings import EMAIL_HOST, EMAIL_HOST_PASSWORD, EMAIL_HOST
 import pyzmail
 import requests
 import jsonpickle
-
+from web_api.models import GcmUser
 
 def send_mail(sender, recipients, subject, text_content, headers=[]):
     """
@@ -61,3 +61,12 @@ def send_gcm_message(reg_ids, data, collapse_key):
                              data=message,
                              headers=headers)
     return response.status_code
+
+def notify_all_users():
+    #Notify all clients of change, pull from server
+    data = {'action' : 'pull'}
+    reg_ids = []
+    for entry in GcmUser.objects.all():
+        reg_ids.append(entry.gcm_id)
+    res = send_gcm_message(reg_ids, data, 'pull')
+    #return res

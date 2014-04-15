@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from web_api.models import *
 import jsonpickle
 from django.core import serializers
-from utils.utils import send_mail, send_gcm_message
+from utils.utils import send_mail, notify_all_users
 from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS, DEBUG, MAIN_URL
 from django.contrib.auth import authenticate
 from web_api.location.ItemPostLocator import ItemPostLocator
@@ -125,12 +125,7 @@ class ThreadPostView(AbstractThreadView):
 
                         new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
 
-                        #Notify all clients of change, pull from server
-                        data = {'action' : 'pull'}
-                        reg_ids = []
-                        for entry in GcmUser.objects.all():
-                            reg_ids.append(entry.gcm_id)
-                        res = send_gcm_message(reg_ids, data, 'pull')
+                        notify_all_users()
 
                         response = jsonpickle.encode({"success": True})
                         return HttpResponse(response)
@@ -189,12 +184,7 @@ class ThreadClaimView(AbstractThreadView):
                     item.claimed = True
                     item.save()
 
-                    #Notify all clients of change, pull from server
-                    data = {'action' : 'pull'}
-                    reg_ids = []
-                    for entry in GcmUser.objects.all():
-                        reg_ids.append(entry.gcm_id)
-                    res = send_gcm_message(reg_ids, data, 'pull')
+                    notify_all_users()
 
                     response = jsonpickle.encode({"success": True})
                     return HttpResponse(response)

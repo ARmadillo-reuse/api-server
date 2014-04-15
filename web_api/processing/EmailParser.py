@@ -14,7 +14,8 @@ import django.utils.timezone
 import nltk
 
 from web_api.location.ItemPostLocator import ItemPostLocator
-from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail, Item
+from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail, Item, GcmUser
+from utils.utils import notify_all_users
 
 
 class EmailParser(object):
@@ -56,7 +57,9 @@ class EmailParser(object):
         for item in thread.item_set.all():
             item.claimed = True
             item.save()
-        
+
+        notify_all_users()
+
         claimed_email = ClaimedItemEmail(subject=email["subject"],
                                          thread=thread, text=email["text"])
 
@@ -68,7 +71,7 @@ class EmailParser(object):
     
     def parse_new_post_email(self, email, thread):
         if not thread:
-            thread = EmailThread.objects.create(subject=email["subject"])
+            thread = EmailThread.objects.create(subject=email["subject"], thread_id="")
         
         post_email = NewPostEmail(sender=email["from"],
                                   subject=email["subject"],
@@ -93,6 +96,8 @@ class EmailParser(object):
         
         item.post_email=post_email
         item.save()
+
+        notify_all_users()
         
         return post_email
     
