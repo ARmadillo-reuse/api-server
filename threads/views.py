@@ -172,7 +172,7 @@ class ThreadClaimView(AbstractThreadView):
                     response = jsonpickle.encode({"success": False})
                     return HttpResponse(response)
 
-                subject = "Re: " + item.thread.subject + " [CLAIMED]"
+                subject = "Re: " + item.thread.subject
                 text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
                 sender = client.email
                 reuse_list = [REUSE_EMAIL_ADDRESS]
