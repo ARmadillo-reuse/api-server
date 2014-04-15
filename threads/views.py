@@ -1,13 +1,16 @@
 from django.views.generic import View
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseServerError
 from web_api.models import *
 import jsonpickle
 from django.core import serializers
-from utils.utils import send_mail
-from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS
+from utils.utils import send_mail, send_gcm_message
+from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS, DEBUG, MAIN_URL
 from django.contrib.auth import authenticate
 from web_api.location.ItemPostLocator import ItemPostLocator
-
+import time
+import logging
+logger = logging.getLogger('armadillo')
+userlogger = logging.getLogger('userlog')
 
 class AbstractThreadView(View):
     """ A base class for all Thread handler views.
@@ -26,6 +29,7 @@ class AbstractThreadView(View):
             if client_user is not None and client_user.is_active:
                 return client_user
             else:
+                logger.info("AUTHENTICATE: User with USERNAME: " + username + " TOKEN: " + token + " denied access." + '\n\n')
                 return None
 
         return None
@@ -43,22 +47,27 @@ class ThreadGetView(AbstractThreadView):
     """
 
     def get(self, request, *args, **kwargs):
+        try:
 
-        client = self.authenticate_user(request, *args, **kwargs)
+            client = self.authenticate_user(request, *args, **kwargs)
 
-        if client is not None:
+            if client is not None:
 
-            if not 'after' in request.GET:
-                return HttpResponseBadRequest("Cannot find 'after' attribute")
+                if not 'after' in request.GET:
+                    return HttpResponseBadRequest("Cannot find 'after' attribute")
 
-            after = request.GET['after']
-            update_items = Item.objects.all().filter(modified__gte=after)
+                after = request.GET['after']
 
-            response_items = serializers.serialize('json', update_items)
+                update_items = Item.objects.all().filter(modified__gte=after)
+                response_items = serializers.serialize('json', update_items)
+                return HttpResponse(response_items)
 
-            return HttpResponse(response_items)
-        else:
-            return HttpResponseForbidden("Invalid Request.")
+            else:
+                return HttpResponseForbidden("Invalid Request.")
+
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponseServerError(e if DEBUG else "An error has occured.")
 
 
 class ThreadPostView(AbstractThreadView):
@@ -74,53 +83,67 @@ class ThreadPostView(AbstractThreadView):
 
     def post(self, request, *args, **kwargs):
 
-        client = self.authenticate_user(request, *args, **kwargs)
+        try:
 
-        if client is not None:
+            client = self.authenticate_user(request, *args, **kwargs)
 
-            attributes = ['name', 'description', 'location', 'tags']
-            for attribute in attributes:
-                if not attribute in request.POST:
-                    return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
+            if client is not None:
 
-            subject = request.POST['name']
-            sender = client.email
-            shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
-            description = request.POST['description']
-            text = description + "\n\n\n\n_______________________________________________\n"+shameless_plug
-            name = request.POST['name']
+                attributes = ['name', 'description', 'location', 'tags']
+                for attribute in attributes:
+                    if not attribute in request.POST:
+                        return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
 
-            reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
+                    subject = request.POST['name']
+                    sender = client.email
+                    shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
+                    description = request.POST['description']
+                    text = description + "\n\n\n\n_______________________________________________\n"+shameless_plug
+                    name = request.POST['name']
+                    thread_id = str(time.time())+"@"+MAIN_URL
+                    headers = [('REUSE-MOBILE', 'true'), ('Message-ID', thread_id)]
 
-            status = send_mail(sender, reuse_list, subject, text)
+                    reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
 
-            if status == 'success':
-                location = request.POST['location']
-                tags = request.POST['tags']
-                new_thread = EmailThread.objects.create(subject=subject)
-                new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
+                    status = send_mail(sender, reuse_list, subject, text, headers)
 
-                ipl = ItemPostLocator()
-                data = ipl.get_location(location.upper())
+                    if status == 'success':
+                        location = request.POST['location']
+                        tags = request.POST['tags']
+                        new_thread = EmailThread.objects.create(subject=subject)
+                        new_email = NewPostEmail.objects.create(sender=sender, subject=subject, text=text, thread=new_thread)
 
-                if data is not None:
-                    lon = str(data['lon'])
-                    lat = str(data['lat'])
-                else:
-                    lon = ''
-                    lat = ''
+                        ipl = ItemPostLocator()
+                        data = ipl.get_location(location.upper())
 
-                new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
+                        if ipl is not None:
+                            lon = str(data['lon'])
+                            lat = str(data['lat'])
+                        else:
+                            lon = ''
+                            lat = ''
 
-                response = jsonpickle.encode({"success": True})
-                return HttpResponse(response)
+                        new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
+
+                        #Notify all clients of change, pull from server
+                        data = {'action' : 'pull'}
+                        reg_ids = []
+                        for entry in GcmUser.objects.all():
+                            reg_ids.append(entry.gcm_id)
+                        res = send_gcm_message(reg_ids, data, 'pull')
+
+                        response = jsonpickle.encode({"success": True})
+                        return HttpResponse(response)
+                    else:
+                        logger.error("POST: "+status + '\n\n')
+                        response = jsonpickle.encode({"success": False})
+                        return HttpResponse(response)
             else:
+                return HttpResponseForbidden("Invalid Request.")
 
-                response = jsonpickle.encode({"success": False})
-                return HttpResponse(response)
-
-        else:
-            return HttpResponseForbidden("Invalid Request.")
+        except Exception as e:
+                logger.exception(str(e))
+                return HttpResponseServerError(e if DEBUG else "An error has occured.")
 
 
 class ThreadClaimView(AbstractThreadView):
@@ -133,39 +156,79 @@ class ThreadClaimView(AbstractThreadView):
 
     def post(self, request, *args, **kwargs):
 
-        client = self.authenticate_user(request, *args, **kwargs)
+        try:
 
-        if client is not None:
+            client = self.authenticate_user(request, *args, **kwargs)
 
-            if not 'item_id' in request.POST:
-                return HttpResponseBadRequest("Cannot find 'item_id' attribute")
+            if client is not None:
 
-            item_id = request.POST['item_id']
-            item = Item.objects.get(pk=item_id)
+                if not 'item_id' in request.POST:
+                    return HttpResponseBadRequest("Cannot find 'item_id' attribute")
 
-            if item.claimed:
-                response = jsonpickle.encode({"success": False})
-                return HttpResponse(response)
+                item_id = request.POST['item_id']
+                item = Item.objects.get(pk=item_id)
 
-            subject = "Re: " + item.thread.subject + " [CLAIMED]"
-            text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
-            sender = client.email
-            reuse_list = [REUSE_EMAIL_ADDRESS]
+                if item.claimed:
+                    response = jsonpickle.encode({"success": False})
+                    return HttpResponse(response)
 
-            status = send_mail(sender, reuse_list, subject, text)
+                subject = "Re: " + item.thread.subject + " [CLAIMED]"
+                text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
+                sender = client.email
+                reuse_list = [REUSE_EMAIL_ADDRESS]
+                thread_id = item.thread.thread_id
+                msg_id = str(time.time())+"@"+MAIN_URL
+                headers = [('REUSE-MOBILE', 'true'), ('Message-ID', msg_id)]
 
-            if status == "success":
-                item.claimed = True
-                item.save()
+                if thread_id != '':
+                    headers.append(('In-Reply-To', thread_id))
 
-                response = jsonpickle.encode({"success": True})
-                return HttpResponse(response)
+                status = send_mail(sender, reuse_list, subject, text)
+
+                if status == "success":
+                    item.claimed = True
+                    item.save()
+
+                    #Notify all clients of change, pull from server
+                    data = {'action' : 'pull'}
+                    reg_ids = []
+                    for entry in GcmUser.objects.all():
+                        reg_ids.append(entry.gcm_id)
+                    res = send_gcm_message(reg_ids, data, 'pull')
+
+                    response = jsonpickle.encode({"success": True})
+                    return HttpResponse(response)
+                else:
+                    logger.error("CLAIM: " + status + '\n\n')
+                    response = jsonpickle.encode({"success": False})
+                    return HttpResponse(response)
             else:
+                return HttpResponseForbidden("Invalid Request.")
 
-                #TODO: possible log errors
+        except Exception as e:
+                    logger.exception(str(e))
+                    return HttpResponseServerError(e if DEBUG else "An error has occured.")
 
-                response = jsonpickle.encode({"success": False})
-                return HttpResponse(response)
 
+class ThreadLogView(AbstractThreadView):
+    """ Recieves log data from client.
+
+    Expects a post request.
+    """
+
+    def post(self, request, *args, **kwargs):
+
+        client = self.authenticate_user(request, *args, **kwargs)
+        
+        if client is not None:
+            log_event = request.POST['log_event']
+            log_details = request.POST['log_details']
+            userlogger.info("User : " + client.username + " Event : " + log_event.upper() + " ==> " + log_details)
+            response = jsonpickle.encode({"success": True})
+            return HttpResponse(response)
         else:
             return HttpResponseForbidden("Invalid Request.")
+
+
+
+

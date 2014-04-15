@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from fabric.api import env, settings, local, run, cd, abort, prefix
 from fabric.contrib.console import confirm
+from fabric.exceptions import CommandTimeout
 
 env.hosts = ['armadillo@armadillo.xvm.mit.edu']
 
@@ -41,6 +42,12 @@ def deploy(state="unstable",app="web_api"):
                     run("python manage.py migrate %s" % app)
                     print "Running tests"
                     run("python manage.py test")
+                    print "Starting SMTP relay client"
+                    try:
+                        run("./smtp/client_server.sh", pty=False, timeout=2)
+                    except CommandTimeout:
+                        pass
+
         print "Restarting web server"
         run("touch armadillo_reuse/wsgi.py")
 

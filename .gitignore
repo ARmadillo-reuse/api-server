@@ -8,3 +8,6 @@
 venv/*
 .idea/*
 .project
+smtp/pid
+smtp/pid
+*.sqlite3

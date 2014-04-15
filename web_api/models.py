@@ -2,6 +2,12 @@ from django.db import models
 
 # Create your models here.
 
+
+class GcmUser(models.Model):
+    user = models.ForeignKey('auth.User')
+    gcm_id = models.CharField(max_length=512)
+
+
 class Item(models.Model):
     """
     An item mentioned in a Reuse email
@@ -98,6 +104,11 @@ class NewPostEmail(AbstractEmail):
     #Can be a room number, an address, or something else
 
     location = models.CharField(max_length=256)
+    
+    def __getattr__(self, name):
+        if name== "items":
+            return self.item_set.all()
+        return super.__getattr__(self, name)
 
     
 class ClaimedItemEmail(AbstractEmail):
@@ -120,6 +131,11 @@ class EmailThread(models.Model):
     # manually.
     #When the thread was last updated
     modified = models.DateTimeField(null=True)
+
+    #This id value can be used for sending claimed emails to the same
+    #tread by usting its value as "In-Reply-To: <value>" in the email
+    #header. Read more here: http://www.rfc-editor.org/rfc/rfc5322.txt
+    thread_id = models.CharField(max_length=256, default="", blank=True)
 
 
 
