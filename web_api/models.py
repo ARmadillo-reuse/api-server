@@ -3,6 +3,13 @@ from django.db import models
 # Create your models here.
 
 
+class UserLogEvent(models.Model):
+    time = models.DateTimeField(auto_now=True)
+    client = models.CharField(max_length=512)
+    event = models.CharField(max_length=1024)
+    detail = models.CharField(max_length=1024)
+
+
 class GcmUser(models.Model):
     user = models.ForeignKey('auth.User')
     gcm_id = models.CharField(max_length=512)

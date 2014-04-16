@@ -124,12 +124,6 @@ LOGGING = {
             'filename': 'armadillo.log',
             'formatter': 'verbose'
         },
-        'userfile': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'userlog.log',
-            'formatter': 'verbose'
-        },
     },
     'loggers': {
         'django': {
@@ -139,10 +133,6 @@ LOGGING = {
         },
         'armadillo': {
             'handlers': ['file'],
-            'level': 'DEBUG',
-        },
-        'userlog' : {
-            'handlers': ['userfile'],
             'level': 'DEBUG',
         },
     }

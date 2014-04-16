@@ -10,7 +10,6 @@ from web_api.location.ItemPostLocator import ItemPostLocator
 import time
 import logging
 logger = logging.getLogger('armadillo')
-userlogger = logging.getLogger('userlog')
 
 class AbstractThreadView(View):
     """ A base class for all Thread handler views.
@@ -213,7 +212,7 @@ class ThreadLogView(AbstractThreadView):
         if client is not None:
             log_event = request.POST['log_event']
             log_details = request.POST['log_details']
-            userlogger.info("User : " + client.username + " Event : " + log_event.upper() + " ==> " + log_details)
+            log = UserLogEvent.objects.create(client=client.username, event=log_event, detail=log_details)
             response = jsonpickle.encode({"success": True})
             return HttpResponse(response)
         else:
