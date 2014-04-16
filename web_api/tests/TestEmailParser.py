@@ -110,7 +110,7 @@ class TestEmailParser(TestCase):
                          })
                        ]
         asserts = {datetime.datetime: lambda x,y:
-                        self.assertTrue(abs(x-y) < datetime.timedelta(0,.5))}
+                        self.assertTrue(abs(x-y) < datetime.timedelta(0,2))}
         
         for email, expected in test_emails:
             parsed = parser.parse(email)

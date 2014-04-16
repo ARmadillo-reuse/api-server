@@ -4,6 +4,7 @@ import socket
 import traceback
 from web_api.processing.EmailPreProcessor import EmailPreProcessor
 from web_api.processing.EmailParser import EmailParser
+from __builtin__ import any
 
 
 class EmailReceiver(asyncore.dispatcher):
@@ -39,6 +40,12 @@ class EmailReceiver(asyncore.dispatcher):
     def parse_incoming_email(self, email_pickle):
         self.log.write("Parsing incoming")
         email = pickle.loads(email_pickle)
+        
+        if not any(eml.endswith("@armadillo.xvm.mit.edu")
+                   for eml in email['rcpttos']):
+            # ignore emails not sent to a user on this server.
+            return
+        
         text = email["data"]
         try:
             self.log.write("subject: %s" % email["subject"])
