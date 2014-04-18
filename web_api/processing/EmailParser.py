@@ -104,25 +104,25 @@ class EmailParser(object):
     
     def get_location_string(self, text):
         sentences = [nltk.word_tokenize(s) for s in nltk.sent_tokenize(text)]
+        pos_tagged = (nltk.pos_tag(sentence) for sentence in sentences)
         
-        possible = []
+        candidates = []
         
-        for sentence in sentences:
-            sent_pos = nltk.pos_tag(sentence)
-            for i, (word, pos) in enumerate(sent_pos):
-                if self.building_regex.match(word) and pos == "CD":
-                    if i > 0 and sent_pos[i-1][1] == "IN":
-                        possible.append(word)
+        for sentence in pos_tagged:
+            for i, (word, pos) in enumerate(sentence):
+                if self.building_regex.match(word) and pos in ["CD", "NNP"]:
+                    if i > 0 and sentence[i-1][1] == "IN":
+                        candidates.append(word)
                         
-                    elif i > 1 and sent_pos[i-1][0].lower() in ["room", "building"] \
-                             and sent_pos[i-2][1] == "IN":
-                        possible.append(word)
+                    elif i > 1 and sentence[i-1][0].lower() in ["room", "building"] \
+                             and sentence[i-2][1] == "IN":
+                        candidates.append(word)
                     
-                    elif i == 1 and sent_pos[0][1] == "JJ":
-                        possible.append(word)
+                    elif i == 1 and sentence[0][1] == "JJ":
+                        candidates.append(word)
         
-        if possible:
-            return max(possible, key=lambda x: len(x))
+        if candidates:
+            return max(candidates, key=lambda x: len(x))
         else:
             return None
         
