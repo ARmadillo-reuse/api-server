@@ -107,10 +107,23 @@ class TestEmailParser(TestCase):
                                     'modified': django.utils.timezone.now()},
                          'location': '7-238',
                          'items': [{'lat': '42.35928952', 'lon': '-71.09317868'}],
-                         })
+                         }),
+                       ({"subject": "Misc computer cruft in E38 - routers, "
+                                    "mice, drives, etc;\n plus music cds",
+                         "from": "jjenkins@mit.edu",
+                         'text': "Just moved a dusty pile of abandoned components "
+                                 "to the lobby of E38. Origin unknown, functionality "
+                                 "unknown. Please take and post.\n\ni/o data switch\n"
+                                 "wireless mouse\nps/2 mice\nmicrocassette dictation "
+                                 "machine\n2 usb desktop video cameras\nLinksys router "
+                                 "(wireless-b)\nNetgear router (rm356)\nInternal "
+                                 "drives: Zip, CD, CD r/rw, floppy\nLots of cables, "
+                                 "drive rails, and case components\nRAM (mostly SIMMs)"},
+                        {'location': 'E38'}
+                        )
                        ]
         asserts = {datetime.datetime: lambda x,y:
-                        self.assertTrue(abs(x-y) < datetime.timedelta(0,.5))}
+                        self.assertTrue(abs(x-y) < datetime.timedelta(0,2))}
         
         for email, expected in test_emails:
             parsed = parser.parse(email)
