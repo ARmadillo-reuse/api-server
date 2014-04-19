@@ -9,6 +9,7 @@ import jsonpickle
 from validate_email import validate_email
 from utils.utils import send_gcm_message, send_mail
 import logging
+from threads.views import AbstractThreadView
 logger = logging.getLogger('armadillo')
 
 
@@ -120,9 +121,8 @@ class UnregisterView(View):
     def post(self, request, *args, **kwargs):
 
         try:
-            client_token = request.GET['token']
-            client_username = request.GET['username']
-            client_user = authenticate(username=client_username, password=client_token)
+            auth_thread = AbstractThreadView()
+            client_user = auth_thread.authenticate_user(request, args, kwargs)
 
             if client_user is not None and client_user.is_active:
                 client_user.delete()
@@ -130,7 +130,7 @@ class UnregisterView(View):
                 response = jsonpickle.encode({"success": True})
                 return HttpResponse(response, content_type="application/json")
             else:
-                logger.info("UNREGISTER: User with USERNAME: " + client_username + " TOKEN: " + client_token + " denied unregistration." + '\n\n')
+                logger.info("UNREGISTER: User with USERNAME: " + client_user.username + " TOKEN: " + request.HEADERS['token'] + " denied unregistration." + '\n\n')
                 return HttpResponseForbidden("Invalid Request.")
 
         except Exception as e:
