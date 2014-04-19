@@ -9,6 +9,8 @@ from django.contrib.auth import authenticate
 from web_api.location.ItemPostLocator import ItemPostLocator
 import time
 import logging
+from django.utils.timezone import activate
+activate('EST') # Assuming timezone will always be EST
 logger = logging.getLogger('armadillo')
 
 class AbstractThreadView(View):
