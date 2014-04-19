@@ -108,3 +108,31 @@ class VerifyView(View):
         except Exception as e:
             logger.exception(str(e))
             return HttpResponseServerError(e if DEBUG else "An error has occured.")
+
+
+class UnregisterView(View):
+    """ This class removes the client from the
+    Reuse Server
+
+    Expects POST request
+    """
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            client_token = request.GET['token']
+            client_username = request.GET['username']
+            client_user = authenticate(username=client_username, password=client_token)
+
+            if client_user is not None and client_user.is_active:
+                client_user.delete()
+
+                response = jsonpickle.encode({"success": True})
+                return HttpResponse(response, content_type="application/json")
+            else:
+                logger.info("UNREGISTER: User with USERNAME: " + client_username + " TOKEN: " + client_token + " denied unregistration." + '\n\n')
+                return HttpResponseForbidden("Invalid Request.")
+
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponseServerError(e if DEBUG else "An error has occured.")
