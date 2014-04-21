@@ -85,7 +85,7 @@ class EmailParser(object):
         if location:
             post_email.location = location
             loc = self.locator.get_location(location)
-            item.location = loc
+            item.location = location
             if loc:
                 item.lat, item.lon = (loc["lat"], loc["lon"])
         else:
@@ -94,7 +94,8 @@ class EmailParser(object):
         thread.save()
         post_email.save()
         
-        item.post_email=post_email
+        item.post_email = post_email
+        item.thread = thread
         item.save()
 
         notify_all_users()
