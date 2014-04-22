@@ -84,8 +84,8 @@ class EmailParser(object):
         location = self.get_location_string(email["text"])
         if location:
             post_email.location = location
+            item.location = location
             loc = self.locator.get_location(location)
-            item.location = loc
             if loc:
                 item.lat, item.lon = (loc["lat"], loc["lon"])
         else:

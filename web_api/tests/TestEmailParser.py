@@ -106,7 +106,7 @@ class TestEmailParser(TestCase):
                          'thread': {'subject': 'pair of shoes',
                                     'modified': django.utils.timezone.now()},
                          'location': '7-238',
-                         'items': [{'lat': '42.35928952', 'lon': '-71.09317868'}],
+                         'items': [{'lat': '42.35928952', 'lon': '-71.09317868', 'location': '7-238'}],
                          }),
                        ({"subject": "Misc computer cruft in E38 - routers, "
                                     "mice, drives, etc;\n plus music cds",
