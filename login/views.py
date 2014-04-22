@@ -9,6 +9,7 @@ import jsonpickle
 from validate_email import validate_email
 from utils.utils import send_gcm_message, send_mail
 import logging
+from threads.views import AbstractThreadView
 logger = logging.getLogger('armadillo')
 
 
@@ -103,6 +104,33 @@ class VerifyView(View):
                 return HttpResponse(response, content_type="text/plain")
             else:
                 logger.info("VERIFY: User with USERNAME: " + client_username + " TOKEN: " + client_token + " denied verification." + '\n\n')
+                return HttpResponseForbidden("Invalid Request.")
+
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponseServerError(e if DEBUG else "An error has occured.")
+
+
+class UnregisterView(View):
+    """ This class removes the client from the
+    Reuse Server
+
+    Expects POST request
+    """
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            auth_thread = AbstractThreadView()
+            client_user = auth_thread.authenticate_user(request, args, kwargs)
+
+            if client_user is not None and client_user.is_active:
+                client_user.delete()
+
+                response = jsonpickle.encode({"success": True})
+                return HttpResponse(response, content_type="application/json")
+            else:
+                logger.info("UNREGISTER: User with USERNAME: " + client_user.username + " TOKEN: " + request.HEADERS['token'] + " denied unregistration." + '\n\n')
                 return HttpResponseForbidden("Invalid Request.")
 
         except Exception as e:

@@ -156,7 +156,8 @@ else:
     else:
         DATABASES["default"] = ALL_DATABASES["stable"]
         #Debug will not be available in production
-        DEBUG = False 
+        DEBUG = False
+        REUSE_EMAIL_ADDRESS = 'reuse@mit.edu'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

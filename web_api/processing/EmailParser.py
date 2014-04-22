@@ -94,7 +94,8 @@ class EmailParser(object):
         thread.save()
         post_email.save()
         
-        item.post_email=post_email
+        item.post_email = post_email
+        item.thread = thread
         item.save()
 
         notify_all_users()
