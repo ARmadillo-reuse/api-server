@@ -24,7 +24,7 @@ class Item(models.Model):
     name = models.CharField(max_length=256)
 
     #The email address of the person who posted this item
-    sender = models.CharField(max_length=64)
+    sender = models.CharField(max_length=64, blank=True)
 
     #description of item
     description = models.TextField(default="", blank=True)
