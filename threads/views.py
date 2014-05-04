@@ -216,7 +216,7 @@ class ThreadClaimView(AbstractThreadView):
                     if should_claim:
                         item.claimed = True
                     else:
-                        item.description = item.description + "\n\n\n<b>>>>>>>>>>[CLAIMED]>>>>>>>>></b>\n" + claim_text
+                        item.description = item.description + "\n\n\n<b>>>>>>>>>>>[CLAIMED]>>>>>>>>>></b>\n" + claim_text
 
                     item.save()
 
