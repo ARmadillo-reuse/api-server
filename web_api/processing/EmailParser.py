@@ -14,7 +14,7 @@ import django.utils.timezone
 import nltk
 
 from web_api.location.ItemPostLocator import ItemPostLocator
-from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail, Item, GcmUser
+from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail, Item
 from utils.utils import notify_all_users
 
 
@@ -78,7 +78,7 @@ class EmailParser(object):
                                   text=email["text"],
                                   thread=thread)
         
-        item = Item(name=email["subject"], description=email["text"],
+        item = Item(name=email["subject"], sender=email["from"], description=email["text"],
                     is_email=True)
         
         location = self.get_location_string(email["text"])
