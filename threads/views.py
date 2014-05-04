@@ -181,7 +181,7 @@ class ThreadClaimView(AbstractThreadView):
                     text += claim_text
 
                 shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
-                text += + "\n\n\n\n_______________________________________________\n"+shameless_plug
+                text += "\n\n\n\n_______________________________________________\n"+shameless_plug
                 sender = client.email
                 reuse_list = [REUSE_EMAIL_ADDRESS]
                 thread_id = item.thread.thread_id
