@@ -95,7 +95,7 @@ class ThreadPostView(AbstractThreadView):
 
                     subject = request.POST['name']
                     sender = client.email
-                    shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
+                    shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
                     description = request.POST['description']
                     text = description + "\n\n Location: " + request.POST['location'] + "\n\n\n\n_______________________________________________\n"+shameless_plug
                     name = request.POST['name']
@@ -180,7 +180,7 @@ class ThreadClaimView(AbstractThreadView):
                     text = "THE FOLLOWING ITEM(S) HAVE BEEN CLAIMED:\n\n"
                     text += claim_text
 
-                shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."
+                shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
                 text += + "\n\n\n\n_______________________________________________\n"+shameless_plug
                 sender = client.email
                 reuse_list = [REUSE_EMAIL_ADDRESS]
