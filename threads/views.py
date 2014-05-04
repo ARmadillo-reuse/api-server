@@ -156,13 +156,32 @@ class ThreadClaimView(AbstractThreadView):
 
             if client is not None:
 
-                attributes = ['item_id', 'text']
+                attributes = ['item_id', 'text', 'email']
                 for attribute in attributes:
                     if not attribute in request.POST:
                         return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
 
+
                 item_id = request.POST['item_id']
                 item = Item.objects.get(pk=item_id)
+
+                if request.POST['email'] == 'true':
+                    # send a claim email only to sender
+
+                    sender = client.email
+                    to = [item.sender]
+                    subject = "Re: " + item.thread.subject
+                    text = request.POST['text']
+                    status = send_mail(sender, to, subject, text)
+
+                    if status == "success":
+                        response = jsonpickle.encode({"success": True})
+                        return HttpResponse(response)
+                    else:
+                        logger.error("CLAIM: " + status + '\n\n')
+                        response = jsonpickle.encode({"success": False})
+                        return HttpResponse(response)
+
 
                 if item.claimed:
                     response = jsonpickle.encode({"success": False})
