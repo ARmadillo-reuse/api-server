@@ -9,8 +9,6 @@ from django.contrib.auth import authenticate
 from web_api.location.ItemPostLocator import ItemPostLocator
 import time
 import logging
-from django.utils.timezone import activate
-activate('EST') # Assuming timezone will always be EST
 logger = logging.getLogger('armadillo')
 
 class AbstractThreadView(View):
@@ -124,7 +122,7 @@ class ThreadPostView(AbstractThreadView):
                             lon = ''
                             lat = ''
 
-                        new_item = Item.objects.create(name=name, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
+                        new_item = Item.objects.create(name=name, sender=sender, description=description, location=location, tags=tags, post_email=new_email, lat=lat, lon=lon, is_email=False, thread=new_thread)
 
                         notify_all_users()
 
@@ -158,8 +156,10 @@ class ThreadClaimView(AbstractThreadView):
 
             if client is not None:
 
-                if not 'item_id' in request.POST:
-                    return HttpResponseBadRequest("Cannot find 'item_id' attribute")
+                attributes = ['item_id', 'text']
+                for attribute in attributes:
+                    if not attribute in request.POST:
+                        return HttpResponseBadRequest("Cannot find '%s' attribute" % attribute)
 
                 item_id = request.POST['item_id']
                 item = Item.objects.get(pk=item_id)
@@ -168,8 +168,17 @@ class ThreadClaimView(AbstractThreadView):
                     response = jsonpickle.encode({"success": False})
                     return HttpResponse(response)
 
+                should_claim = True
+                claim_text = request.POST['text']
+                if claim_text.strip() != '':
+                    should_claim = False
+
                 subject = "Re: " + item.thread.subject
-                text = "ITEM HAS BEEN CLAIMED!\n\n" + item.post_email.text
+                if should_claim:
+                    text = "ITEM(S) HAVE BEEN CLAIMED!\n\n" + item.post_email.text
+                else:
+                    text = "THE FOLLOWING ITEM(S) HAVE BEEN CLAIMED:\n\n"
+                    text += claim_text
                 sender = client.email
                 reuse_list = [REUSE_EMAIL_ADDRESS]
                 thread_id = item.thread.thread_id
@@ -182,7 +191,11 @@ class ThreadClaimView(AbstractThreadView):
                 status = send_mail(sender, reuse_list, subject, text)
 
                 if status == "success":
-                    item.claimed = True
+                    if should_claim:
+                        item.claimed = True
+                    else:
+                        item.description = item.description + "\n\n[UPDATE] SO FAR CLAIMED...\n\n" + claim_text
+
                     item.save()
 
                     notify_all_users()
