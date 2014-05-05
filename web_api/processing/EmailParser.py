@@ -131,13 +131,47 @@ class EmailParser(object):
         """
         Determine the type of object for the given email key-value dictionary.
         """
-        if not thread:
+        claimed_string_detected = self.has_claimed_string(email)
+        is_re = email["subject"].startswith("Re:") or email["subject"].startswith("re:")
+        if not thread and not is_re and not claimed_string_detected:
             return NewPostEmail
-        
-        if self.get_location_string(email["text"]):
-            return NewPostEmail
+
+        if not thread and is_re and len(email["subject"]) > 4:
+            newEmail = email
+            newEmail["subject"] = newEmail["subject"][4:]
+            thread_again = self.parse_email_thread(newEmail)
+            if thread_again:
+                self.parse(newEmail)
+                return None
+            else:
+                #should probably log here as well
+                return None
+
+        if thread and claimed_string_detected:
+            return ClaimedItemEmail
                     
-        return ClaimedItemEmail
+        if thread:
+            self.update_thread(email, thread)
+            return None
+
+        else:
+            # should log here
+            return None
+
+    def has_claimed_string(self, email):
+        claims = [' claimed', 'taken', 'all gone']
+        for claim in claims:
+            if claim in  email["subject"] or claim in email["text"]:
+                return True
+        return False
+
+    def update_thread(self, email, thread):
+        thread_items = Item.objects.all().get(thread=thread)
+        for item in thread_items:
+            item.description = item.description + "\n\n\n<b>>>>>>>>>>>[UPDATE]>>>>>>>>>></b>\n" + email['text']
+            item.save()
+
+
         
     
     def parse_email_thread(self, email):

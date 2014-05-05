@@ -165,13 +165,15 @@ class ThreadClaimView(AbstractThreadView):
                 item_id = request.POST['item_id']
                 item = Item.objects.get(pk=item_id)
 
+                shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
+
                 if request.POST['email'] == 'true':
                     # send a claim email only to sender
 
                     sender = client.email
                     to = [item.sender]
                     subject = "Re: " + item.thread.subject
-                    text = request.POST['text']
+                    text = request.POST['text'] + "\n\n\n\n_______________________________________________\n"+shameless_plug
                     status = send_mail(sender, to, subject, text)
 
                     if status == "success":
@@ -199,7 +201,6 @@ class ThreadClaimView(AbstractThreadView):
                     text = "THE FOLLOWING ITEM(S) HAVE BEEN CLAIMED:\n\n"
                     text += claim_text
 
-                shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
                 text += "\n\n\n\n_______________________________________________\n"+shameless_plug
                 sender = client.email
                 reuse_list = [REUSE_EMAIL_ADDRESS]
