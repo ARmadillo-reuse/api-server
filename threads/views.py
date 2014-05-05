@@ -174,7 +174,9 @@ class ThreadClaimView(AbstractThreadView):
                     to = [item.sender]
                     subject = "Re: " + item.thread.subject
                     text = request.POST['text'] + "\n\n\n\n_______________________________________________\n"+shameless_plug
-                    status = send_mail(sender, to, subject, text)
+                    msg_id = str(time.time())+"@"+MAIN_URL
+                    headers = [('Message-ID', msg_id)]
+                    status = send_mail(sender, to, subject, text, headers)
 
                     if status == "success":
                         response = jsonpickle.encode({"success": True})
@@ -211,7 +213,7 @@ class ThreadClaimView(AbstractThreadView):
                 if thread_id != '':
                     headers.append(('In-Reply-To', thread_id))
 
-                status = send_mail(sender, reuse_list, subject, text)
+                status = send_mail(sender, reuse_list, subject, text, headers)
 
                 if status == "success":
                     if should_claim:
