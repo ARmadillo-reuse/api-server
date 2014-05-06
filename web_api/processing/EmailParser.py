@@ -94,9 +94,9 @@ class EmailParser(object):
 
         # some simple heuristics to tell which is right
         # the email location, or the text location
-        if self.locator.get_location(location1) and ('-' in location1):
+        if location1 and self.locator.get_location(location1) and ('-' in location1):
             location = location1
-        elif self.locator.get_location(location1) and not self.locator.get_location(location2):
+        elif location1 and location2 and self.locator.get_location(location1) and not self.locator.get_location(location2):
             location = location1
         else:
             location = location2
