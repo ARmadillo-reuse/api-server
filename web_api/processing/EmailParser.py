@@ -80,8 +80,19 @@ class EmailParser(object):
         
         item = Item(name=email["subject"], sender=email["from"], description=email["text"],
                     is_email=True)
-        
-        location = self.get_location_string(email["text"])
+
+        location1 = self.get_location_string(email["subject"])
+        location2 = self.get_location_string(email["text"])
+
+        # some simple heuristics to tell which is right
+        # the email location, or the text location
+        if self.locator.get_location(location1) and ('-' in location1):
+            location = location1
+        elif self.locator.get_location(location1) and not self.locator.get_location(location2):
+            location = location1
+        else:
+            location = location2
+
         if location:
             post_email.location = location
             item.location = location
@@ -89,7 +100,8 @@ class EmailParser(object):
             if loc:
                 item.lat, item.lon = (loc["lat"], loc["lon"])
         else:
-            post_email.location = "undetermined"
+            post_email.location = "Undetermined"
+            item.location = "Undetermined"
         
         thread.save()
         post_email.save()
@@ -101,7 +113,6 @@ class EmailParser(object):
         notify_all_users()
         
         return post_email
-    
     
     def get_location_string(self, text):
         sentences = [nltk.word_tokenize(s) for s in nltk.sent_tokenize(text)]
@@ -170,8 +181,6 @@ class EmailParser(object):
         for item in thread_items:
             item.description = item.description + "\n\n\n<b>>>>>>>>>>>[UPDATE]>>>>>>>>>></b>\n" + email['text']
             item.save()
-
-
         
     
     def parse_email_thread(self, email):

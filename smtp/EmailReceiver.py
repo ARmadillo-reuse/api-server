@@ -53,8 +53,15 @@ class EmailReceiver(asyncore.dispatcher):
             pass
         self.log.flush()
         processed = self.preprocessor.parse(text)
-        parsed = self.parser.parse(processed)
-        self.handle_parsed_email(parsed)
+
+        #add known exception subjects lines. Like
+        exceptions = ["Reuse-ask Summary"]
+
+        if processed["subject"] in exceptions:
+            pass
+        else:
+            parsed = self.parser.parse(processed)
+            self.handle_parsed_email(parsed)
     
     def handle_parsed_email(self, parsed):
         parsed.save()
