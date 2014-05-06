@@ -98,7 +98,15 @@ class ThreadPostView(AbstractThreadView):
                     shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
                     description = request.POST['description']
                     text = description + "\n\n Location: " + request.POST['location'] + "\n\n\n\n_______________________________________________\n"+shameless_plug
-                    name = request.POST['name']
+
+
+                    #Prettify item name for display
+                    words = request.POST['name'].split()
+                    name = ''
+                    for word in words:
+                        name += word[0].upper() + word[1:]
+                        name += " "
+                    name = name[:len(name)-1]
                     thread_id = str(time.time())+"@"+MAIN_URL
                     headers = [('REUSE-MOBILE', 'true'), ('Message-ID', thread_id)]
 
