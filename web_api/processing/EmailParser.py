@@ -166,7 +166,7 @@ class EmailParser(object):
         return False
 
     def update_thread(self, email, thread):
-        thread_items = Item.objects.all().get(thread=thread)
+        thread_items = Item.objects.all().filter(thread=thread)
         for item in thread_items:
             item.description = item.description + "\n\n\n<b>>>>>>>>>>>[UPDATE]>>>>>>>>>></b>\n" + email['text']
             item.save()
