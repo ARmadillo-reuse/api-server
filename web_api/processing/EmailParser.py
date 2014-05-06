@@ -77,8 +77,16 @@ class EmailParser(object):
                                   subject=email["subject"],
                                   text=email["text"],
                                   thread=thread)
-        
-        item = Item(name=email["subject"], sender=email["from"], description=email["text"],
+
+        #Prettify item name for display
+        words = email["subject"].split()
+        name = ''
+        for word in words:
+            name += word[0].upper() + word[1:]
+            name += " "
+        name = name[:len(name)-1]
+
+        item = Item(name=name, sender=email["from"], description=email["text"],
                     is_email=True)
 
         location1 = self.get_location_string(email["subject"])
