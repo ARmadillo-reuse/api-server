@@ -44,11 +44,15 @@ class SignupView(View):
                 status = send_mail(verify_from, verify_to, verify_subject, verify_message)
 
                 if status == "success":
-                    #TODO: include device id during initialization to set up GCM push notifications gcm_id?
-                    client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
-                    client_user.is_active = False
-                    client_gcm_user = GcmUser.objects.create(user=client_user, gcm_id=client_gcm_id)
-                    client_user.save()
+                    client_user = User.objects.get(username=client_email)
+                    if client_user is not None:
+                        client_user.is_active = False
+                        client_user.save()
+                    else:
+                        client_user = User.objects.create_user(username=client_email, email=client_email, password=token)
+                        client_user.is_active = False
+                        client_gcm_user = GcmUser.objects.create(user=client_user, gcm_id=client_gcm_id)
+                        client_user.save()
 
                     response = jsonpickle.encode({"success": True})
                     return HttpResponse(response, content_type="application/json")
