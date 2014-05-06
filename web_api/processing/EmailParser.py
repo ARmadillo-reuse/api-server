@@ -108,8 +108,7 @@ class EmailParser(object):
             if loc:
                 item.lat, item.lon = (loc["lat"], loc["lon"])
         else:
-            post_email.location = "Undetermined"
-            item.location = "Undetermined"
+            post_email.location = "undetermined"
         
         thread.save()
         post_email.save()
