@@ -44,7 +44,11 @@ class SignupView(View):
                 status = send_mail(verify_from, verify_to, verify_subject, verify_message)
 
                 if status == "success":
-                    client_user = authenticate(username=client_email)
+                    client_user = None
+                    try:
+                        client_user = User.objects.all().get(username=client_email)
+                    except Exception as e:
+                        pass
                     if client_user is not None:
                         client_user.is_active = False
                         client_user.save()
