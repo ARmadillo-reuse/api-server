@@ -180,7 +180,7 @@ class EmailParser(object):
             return None
 
     def has_claimed_string(self, email):
-        claims = ['claimed', 'taken', 'all gone']
+        claims = ['claimed', 'taken', 'all gone', 'gone']
         for claim in claims:
             if claim in  email["subject"].lower() or claim in email["text"].lower():
                 return True
