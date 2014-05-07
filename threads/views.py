@@ -3,11 +3,12 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from web_api.models import *
 import jsonpickle
 from django.core import serializers
-from utils.utils import send_mail, notify_all_users
+from utils.utils import send_mail, notify_all_users, get_random_fact
 from armadillo_reuse.settings import REUSE_EMAIL_ADDRESS, DEBUG, MAIN_URL
 from django.contrib.auth import authenticate
 from web_api.location.ItemPostLocator import ItemPostLocator
 import time
+import random
 import logging
 logger = logging.getLogger('armadillo')
 
@@ -206,10 +207,14 @@ class ThreadClaimView(AbstractThreadView):
 
                 subject = "Re: " + item.thread.subject
                 if should_claim:
-                    text = "ITEM(S) HAVE BEEN CLAIMED!\n\n" + item.post_email.text
+                    messages = ["ALL GONE!!!", "ITEM(S) HAVE BEEN CLAIMED!", "CLAIMED!!!", "TOO LATE, ALL GONE :)", "GONE! THANKS FOR REUSING", "CLAIMED!!"]
+                    fact = "\nAND NOW FOR AN INTERESTING FACT. DID YOU KNOW:" + get_random_fact()
+                    text = "\n\n" + random.choice(messages) + fact
                 else:
                     text = "THE FOLLOWING ITEM(S) HAVE BEEN CLAIMED:\n\n"
                     text += claim_text
+                    fact = "\n\nAND NOW FOR AN INTERESTING FACT. DID YOU KNOW:" + get_random_fact()
+                    text += fact
 
                 text += "\n\n\n\n_______________________________________________\n"+shameless_plug
                 sender = client.email
@@ -226,8 +231,12 @@ class ThreadClaimView(AbstractThreadView):
                 if status == "success":
                     if should_claim:
                         item.claimed = True
+                        by = "\n\n <b>By:</b> " + client.email
+                        item.description = item.description + "\n\n\n<b>>>>>>>>>>>[ALL GONE]>>>>>>>>>></b>\n" + by
+                        item.description += "\n\n<b><<<<<<<<<<[CLOSED]<<<<<<<<<<</b>"
                     else:
-                        item.description = item.description + "\n\n\n<b>>>>>>>>>>>[CLAIMED]>>>>>>>>>></b>\n" + claim_text
+                        by = "\n\n <b>By:</b> " + client.email
+                        item.description = item.description + "\n\n\n<b>>>>>>>>>>>[CLAIMED]>>>>>>>>>></b>\n" + claim_text + by
 
                     item.save()
 

@@ -3,6 +3,9 @@ import pyzmail
 import requests
 import jsonpickle
 from web_api.models import GcmUser
+import random
+from bs4 import BeautifulSoup
+import urllib2
 
 def send_mail(sender, recipients, subject, text_content, headers=[]):
     """
@@ -70,3 +73,16 @@ def notify_all_users():
         reg_ids.append(entry.gcm_id)
     res = send_gcm_message(reg_ids, data, 'pull')
     #return res
+
+def get_random_fact():
+    page = urllib2.urlopen('http://feeds.feedburner.com/factualfacts').read()
+    soup = BeautifulSoup(page)
+    facts = soup.find_all('item')
+    random_fact = random.choice(facts)
+    while len(random_fact.description.get_text().split('>')) != 2:
+        random_fact = random.choice(facts)
+    string = "\n"
+    string += random_fact.title.get_text() + '\n\n'
+    string += random_fact.description.get_text().split('>')[1] + '\n\n'
+    string += 'Source: ' + random_fact.link.get_text()
+    return string

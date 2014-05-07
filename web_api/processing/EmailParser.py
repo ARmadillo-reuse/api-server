@@ -56,6 +56,9 @@ class EmailParser(object):
         
         for item in thread.item_set.all():
             item.claimed = True
+            by = "\n\n <b>By:</b> " + email['from']
+            item.description = item.description + "\n\n\n<b>>>>>>>>>>>[ALL GONE]>>>>>>>>>></b>\n" + by
+            item.description += "\n\n<b><<<<<<<<<<[CLOSED]<<<<<<<<<<</b>"
             item.save()
 
         notify_all_users()
@@ -177,16 +180,17 @@ class EmailParser(object):
             return None
 
     def has_claimed_string(self, email):
-        claims = [' claimed', 'taken', 'all gone']
+        claims = ['claimed', 'taken', 'all gone']
         for claim in claims:
-            if claim in  email["subject"] or claim in email["text"]:
+            if claim in  email["subject"].lower() or claim in email["text"].lower():
                 return True
         return False
 
     def update_thread(self, email, thread):
         thread_items = Item.objects.all().filter(thread=thread)
         for item in thread_items:
-            item.description = item.description + "\n\n\n<b>>>>>>>>>>>[UPDATE]>>>>>>>>>></b>\n" + email['text']
+            by = "\n\n <b>From:<b> " + email["from"]
+            item.description = item.description + "\n\n\n<b>>>>>>>>>>>[UPDATE]>>>>>>>>>></b>\n" + email['text'] + by
             item.save()
         
     
