@@ -96,9 +96,9 @@ class ThreadPostView(AbstractThreadView):
 
                     subject = request.POST['name']
                     sender = client.email
-                    shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
+                    shameless_plug = "Sent using REUSE Mobile App. Get it at armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
                     description = request.POST['description']
-                    text = description + "\n\n Location: " + request.POST['location'] + "\n\n\n\n_______________________________________________\n"+shameless_plug
+                    text = description + "\n\n Location: " + request.POST['location'] + "\n\n_______________________________________________\n"+shameless_plug
 
 
                     #Prettify item name for display
@@ -174,7 +174,7 @@ class ThreadClaimView(AbstractThreadView):
                 item_id = request.POST['item_id']
                 item = Item.objects.get(pk=item_id)
 
-                shameless_plug = "SENT USING REUSE MOBILE APP. GET IT AT armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
+                shameless_plug = "Sent using REUSE Mobile App. Get it at armadillo.xvm.mit.edu."+"\n Email: armadillo@mit.edu"
 
                 if request.POST['email'] == 'true':
                     # send a claim email only to sender
@@ -182,7 +182,7 @@ class ThreadClaimView(AbstractThreadView):
                     sender = client.email
                     to = [item.sender]
                     subject = "Re: " + item.thread.subject
-                    text = request.POST['text'] + "\n\n\n\n_______________________________________________\n"+shameless_plug
+                    text = request.POST['text'] + "\n\n_______________________________________________\n"+shameless_plug
                     msg_id = str(time.time())+"@"+MAIN_URL
                     headers = [('Message-ID', msg_id)]
                     status = send_mail(sender, to, subject, text, headers)
@@ -207,16 +207,16 @@ class ThreadClaimView(AbstractThreadView):
 
                 subject = "Re: " + item.thread.subject
                 if should_claim:
-                    messages = ["ALL GONE!!!", "ITEM(S) HAVE BEEN CLAIMED!", "CLAIMED!!!", "TOO LATE, ALL GONE :)", "GONE! THANKS FOR REUSING", "CLAIMED!!"]
-                    fact = "\nAND NOW FOR AN INTERESTING FACT. DID YOU KNOW:" + get_random_fact()
-                    text = "\n\n" + random.choice(messages) + fact
+                    messages = ["All gone!!!", "Item(s) have been claimed!", "Claimed!!!", "Too late, all gone (t-lag)!", "Gone! Thanks for reusing.", "Claimed!!"]
+                    fact = "\n\n\nAnd now for an interesting fact. Did you know:" + get_random_fact()
+                    text = "\n\n" + "<b>" + random.choice(messages) + "</b>" + fact
                 else:
-                    text = "THE FOLLOWING ITEM(S) HAVE BEEN CLAIMED:\n\n"
+                    text = "<b>I hereby claim the following items:<b>\n\n"
                     text += claim_text
-                    fact = "\n\nAND NOW FOR AN INTERESTING FACT. DID YOU KNOW:" + get_random_fact()
+                    fact = "\n\n\nAnd now for an interesting fact. Did you know:" + get_random_fact()
                     text += fact
 
-                text += "\n\n\n\n_______________________________________________\n"+shameless_plug
+                text += "\n\n_______________________________________________\n"+shameless_plug
                 sender = client.email
                 reuse_list = [REUSE_EMAIL_ADDRESS]
                 thread_id = item.thread.thread_id

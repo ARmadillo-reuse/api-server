@@ -13,7 +13,6 @@ def send_mail(sender, recipients, subject, text_content, headers=[]):
     """
     prefered_encoding = 'iso-8859-1'
     text_encoding = 'iso-8859-1'
-
     smtp_host = EMAIL_HOST
     smtp_port = EMAIL_PORT
     smtp_mode = 'tls' if EMAIL_USE_TLS else 'normal'
@@ -25,8 +24,8 @@ def send_mail(sender, recipients, subject, text_content, headers=[]):
         recipients,
         subject,
         prefered_encoding,
-        (text_content, text_encoding),
-        html=None, headers=headers)
+        None,
+        html=(text_content.replace("\n","<br />\n"), "us-ascii"), headers=headers)
 
     ret = pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp_port, smtp_mode=smtp_mode,
                             smtp_login=smtp_login, smtp_password=smtp_password)
@@ -81,8 +80,8 @@ def get_random_fact():
     random_fact = random.choice(facts)
     while len(random_fact.description.get_text().split('>')) != 2:
         random_fact = random.choice(facts)
-    string = "\n"
-    string += random_fact.title.get_text() + '\n\n'
-    string += random_fact.description.get_text().split('>')[1] + '\n\n'
-    string += 'Source: ' + random_fact.link.get_text()
+    string = "\n\n"
+    string += str(random_fact.title.get_text().encode('utf-8')) + '\n\n'
+    string += str(random_fact.description.get_text().encode('utf-8').split('>')[1]) + '\n\n'
+    string += 'Source: ' + str(random_fact.link.get_text().encode('utf-8'))
     return string
