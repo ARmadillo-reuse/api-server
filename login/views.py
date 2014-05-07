@@ -133,6 +133,8 @@ class UnregisterView(View):
             client_user = auth_thread.authenticate_user(request, args, kwargs)
 
             if client_user is not None and client_user.is_active:
+                client_gcm = GcmUser.objects.get(email=client_user.email)
+                client_gcm.delete()
                 client_user.delete()
 
                 response = jsonpickle.encode({"success": True})
