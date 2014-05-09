@@ -208,13 +208,13 @@ class ThreadClaimView(AbstractThreadView):
                 subject = "Re: " + item.thread.subject
                 if should_claim:
                     messages = ["All gone!!!", "Item(s) have been claimed!", "Claimed!!!", "Too late, all gone (t-lag)!", "Gone! Thanks for reusing.", "Claimed!!"]
-                    fact = "\n\n\nAnd now for an interesting fact. Did you know:" + get_random_fact()
-                    text = "\n\n" + "<b>" + random.choice(messages) + "</b>" + fact
+                    #fact = "\n\n\nAnd now for an interesting fact. Did you know:" + get_random_fact()
+                    text = "\n\n" + "<b>" + random.choice(messages) + "</b>" #+ fact
                 else:
                     text = "<b>I hereby claim the following items:<b>\n\n"
                     text += claim_text
-                    fact = "\n\n\nAnd now for an interesting fact. Did you know:" + get_random_fact()
-                    text += fact
+                    #fact = "\n\n\nAnd now for an interesting fact. Did you know:" + get_random_fact()
+                    #text += fact
 
                 text += "\n\n_______________________________________________\n"+shameless_plug
                 sender = client.email
