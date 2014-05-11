@@ -24,7 +24,7 @@ class EmailReceiver(asyncore.dispatcher):
     
     def handle_read(self):
         self.buffer += self.recv(8192)
-        print len(self.buffer)
+        #print len(self.buffer)
         if "\x00" in self.buffer:
             email = self.buffer[:self.buffer.find('\x00')]
             if email:

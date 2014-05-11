@@ -109,7 +109,7 @@ class ThreadPostView(AbstractThreadView):
                         name += " "
                     name = name[:len(name)-1]
                     thread_id = str(time.time())+"@"+MAIN_URL
-                    headers = [('REUSE-MOBILE', 'true'), ('Message-ID', thread_id)]
+                    headers = [('Message-Id', thread_id)]
 
                     reuse_list = [REUSE_EMAIL_ADDRESS]  # testing
 
@@ -184,7 +184,7 @@ class ThreadClaimView(AbstractThreadView):
                     subject = "Re: " + item.thread.subject
                     text = request.POST['text'] + "\n\n_______________________________________________\n"+shameless_plug
                     msg_id = str(time.time())+"@"+MAIN_URL
-                    headers = [('Message-ID', msg_id)]
+                    headers = [('Message-Id', msg_id)]
                     status = send_mail(sender, to, subject, text, headers)
 
                     if status == "success":
@@ -221,7 +221,7 @@ class ThreadClaimView(AbstractThreadView):
                 reuse_list = [REUSE_EMAIL_ADDRESS]
                 thread_id = item.thread.thread_id
                 msg_id = str(time.time())+"@"+MAIN_URL
-                headers = [('REUSE-MOBILE', 'true'), ('Message-ID', msg_id)]
+                headers = [('Message-Id', msg_id)]
 
                 if thread_id != '':
                     headers.append(('In-Reply-To', thread_id))

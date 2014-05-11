@@ -20,7 +20,13 @@ class EmailPreProcessor(object):
         text = self.parse_text(eml)
         text = self.strip_reply(text)
         values["text"] = self.strip_signature(text)
+        values["headers"] = self.parse_headers(text)
         return values
+
+    def parse_headers(self, text):
+        h = email.parser.HeaderParser()
+        headers = h.parsestr(text)
+        return headers.items()
 
     def parse_from(self, addr):
         """

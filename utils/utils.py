@@ -6,6 +6,7 @@ from web_api.models import GcmUser
 import random
 from bs4 import BeautifulSoup
 import urllib2
+from armadillo_reuse.settings import REUSE_HEADER
 
 def send_mail(sender, recipients, subject, text_content, headers=[]):
     """
@@ -18,6 +19,8 @@ def send_mail(sender, recipients, subject, text_content, headers=[]):
     smtp_mode = 'tls' if EMAIL_USE_TLS else 'normal'
     smtp_login = EMAIL_HOST_USER if EMAIL_HOST_USER != '' else None
     smtp_password = EMAIL_HOST_PASSWORD if EMAIL_HOST_USER != '' else None
+
+    headers.append(REUSE_HEADER)
 
     payload, mail_from, rcpt_to, msg_id = pyzmail.compose_mail(
         ("Reuse Mobile", sender),

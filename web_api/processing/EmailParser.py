@@ -16,6 +16,7 @@ import nltk
 from web_api.location.ItemPostLocator import ItemPostLocator
 from web_api.models import EmailThread, NewPostEmail, ClaimedItemEmail, Item
 from utils.utils import notify_all_users
+from armadillo_reuse.settings import REUSE_HEADER
 
 
 class EmailParser(object):
@@ -152,6 +153,10 @@ class EmailParser(object):
         """
         Determine the type of object for the given email key-value dictionary.
         """
+        if REUSE_HEADER in email["headers"]:
+            #email must've been sent from the App, ignore it.
+            return None
+
         claimed_string_detected = self.has_claimed_string(email)
         is_re = email["subject"].startswith("Re:") or email["subject"].startswith("re:")
         if not thread and not is_re and not claimed_string_detected:

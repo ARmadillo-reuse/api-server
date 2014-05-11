@@ -14,7 +14,7 @@ class IncomingServer(SMTPServer):
     def process_message(self, peer, mailfrom, rcpttos, data):
         pickle_data = pickle.dumps({"peer": peer, "mailfrom": mailfrom,
                       "rcpttos": rcpttos, "data": data})
-        print "received message"
+        #print "received message"
         self.outgoing.relay(pickle_data)
 
 class OutgoingServer(asyncore.dispatcher):
@@ -32,7 +32,7 @@ class OutgoingServer(asyncore.dispatcher):
         pair = self.accept();
         if pair:
             conn = pair[0]
-            print 'Incoming connection'
+            #print 'Incoming connection'
             handler = SendHandler(conn, self)
             self.clients.append(handler)
     
@@ -40,7 +40,7 @@ class OutgoingServer(asyncore.dispatcher):
         self.close()
         
     def relay(self, data):
-        print "relaying message"
+        #print "relaying message"
         for con in self.clients:
             con.send(data)
             # Send the null terminator

@@ -26,6 +26,7 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 REUSE_EMAIL_ADDRESS = 'armadillo-test@mit.edu'
+REUSE_HEADER = ("X-Reuse-Moble", "No-Parse")
 
 GCM_API_KEY = 'AIzaSyDSSl8EK8t0xwUEgrYAcT0C84YGaDXafEY'
 
